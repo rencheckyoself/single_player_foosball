@@ -1,0 +1,8 @@
+<launch>
+
+  <!-- This launch file is start up the nodes to interact with the tic controllers -->
+  <node name="tic_cmd" type="tic_cmd" pkg="table_motor_control" output="screen">
+    <rosparam command="load" file="$(find table_motor_control)/config/serial_numbers.yaml" />
+  </node>
+
+</launch>
