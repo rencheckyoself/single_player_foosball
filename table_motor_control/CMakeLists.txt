@@ -22,6 +22,7 @@ set(ticAPI_LIBRARIES /usr/local/lib/libpololu-tic-1.so)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  std_srvs
 )
 
 ## System dependencies are found with CMake's conventions
