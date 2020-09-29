@@ -44,7 +44,7 @@ int main(int argc, char** argv)
 
   fwd_rot.get_current_pos();
 
-  fwd_rot.OfferServices(n);
+  fwd_rot.offer_services(n);
 
   // ros::ServiceServer service = n.advertiseService("_update_settings", &tic_server::TicCtrlr::import_settings, &fwd_rot);
 

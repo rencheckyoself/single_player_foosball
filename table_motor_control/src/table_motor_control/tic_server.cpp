@@ -16,9 +16,11 @@ namespace tic_server
     nickname = name;
   }
 
-  void TicCtrlr::OfferServices(ros::NodeHandle &n)
+  void TicCtrlr::offer_services(ros::NodeHandle &n)
   {
-    service = n.advertiseService(nickname + "_update_settings", &TicCtrlr::import_settings, this);
+    settings_service = n.advertiseService(nickname + "_update_settings", &TicCtrlr::import_settings, this);
+    target_service = n.advertiseService(nickname + "_set_target_pos", &TicCtrlr::set_position, this);
+    reset_home_service = n.advertiseService(nickname + "_reset_current_pos", &TicCtrlr::reset_global_position, this);
   }
 
   void TicCtrlr::get_current_pos()
@@ -27,10 +29,27 @@ namespace tic_server
     std::cout << "Current position is " << position << ".\n";
   }
 
+  bool TicCtrlr::set_position(table_motor_control::Int32::Request &req, table_motor_control::Int32::Response &res)
+  {
+    set_position(req.data);
+    return 1;
+  }
+
   void TicCtrlr::set_position(int32_t val)
   {
     handle.halt_and_hold();
     handle.set_target_position(val);
+  }
+
+  bool TicCtrlr::reset_global_position(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res)
+  {
+    reset_global_position();
+    return 1;
+  }
+
+  void TicCtrlr::reset_global_position()
+  {
+    handle.halt_and_set_position(0);
   }
 
   void TicCtrlr::display_settings()
@@ -38,7 +57,7 @@ namespace tic_server
     std::cout << "TIC SETTINGS: " << handle.get_settings().to_string() << std::endl;
   }
 
-  bool TicCtrlr::import_settings(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res)
+  void TicCtrlr::import_settings()
   {
     // get file and convert it to a string
     std::ifstream ifs("/home/michaelrencheck/FinalProject/src/table_motor_control/config/tic_settings.txt");
@@ -53,6 +72,11 @@ namespace tic_server
     tic::settings s = tic::settings::read_from_string(content);
 
     handle.set_settings(s);
+  }
+
+  bool TicCtrlr::import_settings(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res)
+  {
+    import_settings();
 
     return 1;
   }

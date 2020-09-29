@@ -38,7 +38,7 @@ tx_config: default
 rx_config: default
 rc_config: default
 invert_motor_direction: true
-max_speed: 2000000
+max_speed: 3000000
 starting_speed: 0
 max_accel: 40000
 max_decel: 0
