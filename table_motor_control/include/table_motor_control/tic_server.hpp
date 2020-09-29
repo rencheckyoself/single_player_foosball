@@ -63,6 +63,24 @@ namespace tic_server
     /// \brief imports a text file to change the settings of the tic controller
     void import_settings();
 
+    /// \brief callback service wrapper function to resume stepped operation
+    /// \param req no request
+    /// \param res no response
+    /// \returns 1 for success, 0 for failure
+    bool resume(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res);
+
+    /// \brief energizes the stepper motor and exits the safe start state
+    void resume();
+
+    /// \brief callback service wrapper function to resume stepped operation
+    /// \param req no request
+    /// \param res no response
+    /// \returns 1 for success, 0 for failure
+    bool deenergize(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res);
+
+    /// \brief cuts off current to the motor so there is no holding power
+    void deenergize();
+
   private:
 
     /// \brief Opens a handle to a Tic that can be used for communication. Code pulled from Tic User Manual.
@@ -82,8 +100,9 @@ namespace tic_server
     ros::ServiceServer settings_service; ///< service to update a tic controllers settings
     ros::ServiceServer target_service; ///< service to send an absolute position command
     ros::ServiceServer reset_home_service; ///< stops the motor and sets the current position as the 0 position
+    ros::ServiceServer resume_service; ///< turns the motor on
+    ros::ServiceServer deenergize_service; ///< turns the motor off
   };
-
 }
 
 #endif //PFIELD_INCLUDE_GUARD_HPP

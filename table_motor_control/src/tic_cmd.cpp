@@ -40,20 +40,14 @@ int main(int argc, char** argv)
   ROS_INFO_STREAM("TICCMD: Forward Linear Name: " << fwd_lin_nickname);
 
   tic_server::TicCtrlr fwd_rot(fwd_rot_sn, fwd_rot_nickname);
-  // tic_server::TicCtrlr fwd_lin(fwd_lin_sn);
-
-  fwd_rot.get_current_pos();
+  tic_server::TicCtrlr fwd_lin(fwd_lin_sn, fwd_lin_nickname);
 
   fwd_rot.offer_services(n);
+  fwd_lin.offer_services(n);
 
-  // ros::ServiceServer service = n.advertiseService("_update_settings", &tic_server::TicCtrlr::import_settings, &fwd_rot);
-
-  // fwd_lin.get_current_pos();
-
-  // fwd_rot.display_settings();
-
-  // fwd_rot.import_settings();
-
+  fwd_rot.resume();
+  fwd_lin.resume();
+  
   ros::spin();
 
   return 0;

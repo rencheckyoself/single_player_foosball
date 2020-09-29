@@ -1,0 +1,3 @@
+- svn:
+    local-name: oCam
+    uri: https://github.com/withrobot/oCam/trunk/Software/oCam_ROS_Package/ocam

@@ -13,7 +13,7 @@ serial_device_number: 14
 serial_alt_device_number: 0
 serial_enable_alt_device_number: false
 serial_14bit_device_number: false
-command_timeout: 1000
+command_timeout: 0
 serial_crc_for_commands: false
 serial_crc_for_responses: false
 serial_7bit_responses: false
@@ -38,14 +38,14 @@ tx_config: default
 rx_config: default
 rc_config: default
 invert_motor_direction: true
-max_speed: 3000000
+max_speed: 13000000
 starting_speed: 0
-max_accel: 40000
+max_accel: 1300000
 max_decel: 0
 step_mode: 1
-current_limit: 192
+current_limit: 384
 current_limit_during_error: -1
-decay_mode: mixed
+decay_mode: slow
 auto_homing: false
 auto_homing_forward: false
 homing_speed_towards: 1000000

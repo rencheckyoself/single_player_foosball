@@ -21,12 +21,13 @@ namespace tic_server
     settings_service = n.advertiseService(nickname + "_update_settings", &TicCtrlr::import_settings, this);
     target_service = n.advertiseService(nickname + "_set_target_pos", &TicCtrlr::set_position, this);
     reset_home_service = n.advertiseService(nickname + "_reset_current_pos", &TicCtrlr::reset_global_position, this);
+    resume_service = n.advertiseService(nickname + "_resume", &TicCtrlr::resume, this);
+    deenergize_service = n.advertiseService(nickname + "_deenergize", &TicCtrlr::deenergize, this);
   }
 
-  void TicCtrlr::get_current_pos()
+  int32_t TicCtrlr::get_current_pos()
   {
-    int32_t position = handle.get_variables().get_current_position();
-    std::cout << "Current position is " << position << ".\n";
+    return handle.get_variables().get_current_position();
   }
 
   bool TicCtrlr::set_position(table_motor_control::Int32::Request &req, table_motor_control::Int32::Response &res)
@@ -60,7 +61,7 @@ namespace tic_server
   void TicCtrlr::import_settings()
   {
     // get file and convert it to a string
-    std::ifstream ifs("/home/michaelrencheck/FinalProject/src/table_motor_control/config/tic_settings.txt");
+    std::ifstream ifs("/home/michaelrencheck/FinalProject/src/table_motor_control/config/" + nickname + "_settings.txt");
     std::string content((std::istreambuf_iterator<char>(ifs) ), (std::istreambuf_iterator<char>() ));
 
     // Check if the file was not found
@@ -77,8 +78,34 @@ namespace tic_server
   bool TicCtrlr::import_settings(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res)
   {
     import_settings();
-
     return 1;
+  }
+
+  bool TicCtrlr::resume(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res)
+  {
+    resume();
+    return 1;
+  }
+
+  void TicCtrlr::resume()
+  {
+
+    // set the target to the current position to prevent movement if the motor is not at its target position.
+    handle.set_target_position(handle.get_variables().get_current_pos());
+
+    handle.exit_safe_start();
+    handle.energize();
+  }
+
+  bool TicCtrlr::deenergize(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res)
+  {
+    deenergize();
+    return 1;
+  }
+
+  void TicCtrlr::deenergize()
+  {
+    handle.deenergize();
   }
 
  tic::handle TicCtrlr::open_handle(std::string desired_serial_number)
