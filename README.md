@@ -6,6 +6,7 @@
 The following are other software packages required to run the software for the table:
   - ROS Melodic
   - Pololu tic Software
+  - OpenCV
 
 ## Installation
 
@@ -33,3 +34,11 @@ Finally, go back to the top level of the directory and build the workspace:
 cd ..
 catkin_make
 ```
+
+## Packages
+
+### Control
+`table_motor_control`: Files to interact with the TIC API
+
+### Vision
+This package is currently set up to follow the [ROS image_pipeline](http://wiki.ros.org/image_pipeline) structure. The `table_vision_sensing` package is set up to be camera agnostic, so feel free to use your own camera in place of the one linked in the parts list. The performance of the system may differ if your chosen camera runs at a slower FPS.
