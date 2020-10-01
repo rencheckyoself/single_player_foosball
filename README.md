@@ -13,3 +13,23 @@ Begin by installing some of the external software dependancies:
   - The instructions for installing ROS Melodic are found [here](http://wiki.ros.org/melodic/Installation/Ubuntu).
 
   - The instructions to install the Pololu tic Software are found [here](https://github.com/pololu/pololu-tic-software). See relevant section in the BUILDING.md file to build the library from source, these were the [directions](https://github.com/pololu/pololu-tic-software/blob/master/BUILDING.md#building-from-source-on-linux-for-linux) I used.
+
+After installing these create a new catkin workspace and clone this repository:
+
+```
+mkdir SinglePlayerFoosball
+cd SinglePlayerFoosball
+git clone https://github.com/rencheckyoself/single_player_foosball.git src
+```
+
+Then go into the repository and use wstool. This will download my forked version of the oCam package.
+```
+cd src
+wstool update
+```
+
+Finally, go back to the top level of the directory and build the workspace:
+```
+cd ..
+catkin_make
+```

@@ -30,7 +30,8 @@ namespace tic_server
     void offer_services(ros::NodeHandle &n);
 
     /// \brief get the current position of the stepper
-    void get_current_pos();
+    /// \returns the integer position for where the controller thinks the stepper is
+    int32_t get_current_pos();
 
     /// \brief callback service wrapper function to send the motor to a target position
     /// \param req service request data is only an int32

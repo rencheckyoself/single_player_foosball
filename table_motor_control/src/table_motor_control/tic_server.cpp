@@ -89,9 +89,8 @@ namespace tic_server
 
   void TicCtrlr::resume()
   {
-
     // set the target to the current position to prevent movement if the motor is not at its target position.
-    handle.set_target_position(handle.get_variables().get_current_pos());
+    handle.set_target_position(handle.get_variables().get_current_position());
 
     handle.exit_safe_start();
     handle.energize();
