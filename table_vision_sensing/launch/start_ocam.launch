@@ -1,0 +1,12 @@
+<launch>
+
+  <include file="$(find ocam)/launch/ocam_ros.launch">
+    <arg name="show_image" value="false"/>
+  </include>
+  <node ns="camera" name="image_proc" pkg="image_proc" type="image_proc"/>
+
+  <node name="ball_tracking" type="ball_tracking" pkg="table_vision_sensing" output="screen">
+    <param name="blur_val" value="17"/> <!-- must be an odd number -->
+  </node>
+
+</launch>
