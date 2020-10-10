@@ -1,0 +1,21 @@
+# all dimensions are in meters
+
+# Visual Parameters
+rod_length: 0.410
+rod_diameter: 0.0077
+
+player_width: 0.014
+player_depth: 0.011
+player_height: 0.070
+
+ball_diameter: 0.0274
+
+field_length: 0.402
+field_width: 0.285
+
+wall_height: 0.062
+
+goal_height: 0.040
+goal_width: 0.080
+
+# Interial Parameters

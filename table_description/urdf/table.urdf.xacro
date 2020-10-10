@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="diff_drive">
+
+  <xacro:property name="props" value="${load_yaml('$(find table_description)/config/table_params.yaml')}"/>
+
+  <xacro:property name="rod_length" value="${props['rod_length']}"/>
+  <xacro:property name="rod_diameter" value="${props['rod_diameter']}"/>
+  <xacro:property name="player_width" value="${props['player_width']}"/>
+  <xacro:property name="player_depth" value="${props['player_depth']}"/>
+  <xacro:property name="player_height" value="${props['player_height']}"/>
+  <xacro:property name="ball_diameter" value="${props['ball_diameter']}"/>
+  <xacro:property name="field_width" value="${props['field_width']}"/>
+  <xacro:property name="field_length" value="${props['field_length']}"/>
+  <xacro:property name="goal_width" value="${props['goal_width']}"/>
+  <xacro:property name="goal_height" value="${props['goal_height']}"/>
+  <xacro:property name="wall_height" value="${props['wall_height']}"/>
+
+  <xacro:property name="wall_thickness" value="0.015"/>
+  <xacro:property name="field_thickness" value="0.005"/>
+
+  <!-- Macro to create a player -->
+  <xacro:macro name="player" params="name r g b">
+    <link name="${name}">
+      <geometry>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <box size="${player_height} ${player_width} ${player_depth}"/>
+        <material name="White">
+          <color rgba="r g b 1.0"/>
+        </material>
+      </geometry>
+    </link>
+  </xacro:macro>
+
+  <!-- Macro to create a player rod -->
+  <xacro:macro name="player_rod" params="name r g b">
+    <link name="${name}">
+      <visual>
+        <geometry>
+          <cylinder length="${rod_length}" radius="${rod_diameter}/2"/>
+        </geometry>
+      </visual>
+  </xacro:macro>
+
+  <xacro:macro name="side_wall" params="side">
+    <link name="${name}_side_wall">
+      <visual>
+        <geometry>
+          <box size="${field_length} ${field_width} ${wall_height}"/>
+        </geometry>
+      </visual>
+    </link>
+  </xacro:macro>
+
+  <link name="base_link">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </link>
+
+  <link name="field">
+    <visual>
+      <geometry>
+        <box size="${field_length} ${field_width} ${field_thickness}"/>
+      </geometry>
+      <material name="Grass">
+        <color rgba="0 0.75 0 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="field_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="base_link"/>
+    <child link="field"/>
+  </joint>
+  
+</robot>

@@ -33,7 +33,8 @@ public:
     image_sub_ = it_.subscribe("/camera/image_rect", 1, &ImageConverter::imageCb, this);
     image_pub_ = it_.advertise("/image_converter/output_video", 1);
 
-    ros::param::param("ball_tracking/blur_val", blur_val_, 5);
+    ros::NodeHandle n("~");
+    n.param("blur_val", blur_val_, 5);
 
     ROS_INFO_STREAM("Using blur of: " << blur_val_);
 
@@ -66,9 +67,7 @@ public:
     cv::medianBlur(grey, grey, blur_val_);
 
     std::vector<cv::Vec3f> circles;
-    cv::HoughCircles(grey, circles, cv::HOUGH_GRADIENT, 1, 5, 10, 22, 10, 20);
-
-    ROS_INFO_STREAM("Found " << circles.size() << " circles.");
+    cv::HoughCircles(grey, circles, cv::HOUGH_GRADIENT, 1, 4, 40, 22, 10, 18);
 
     for( size_t i = 0; i < circles.size(); i++ )
     {
@@ -76,13 +75,17 @@ public:
       cv::Point center = cv::Point(c[0], c[1]);
       // circle center
       cv::circle(cv_ptr->image, center, 1, cv::Scalar(0,100,100), 3, cv::LINE_AA);
+      cv::circle(grey, center, 1, cv::Scalar(0,100,100), 3, cv::LINE_AA);
       // circle outline
       int radius = c[2];
-      cv::circle(cv_ptr->image, center, radius, cv::Scalar(255,0,255), 3, cv::LINE_AA);
+      cv::circle(cv_ptr->image, center, radius, cv::Scalar(0,0,255), 3, cv::LINE_AA);
+      cv::circle(grey, center, radius, cv::Scalar(255,0,255), 3, cv::LINE_AA);
     }
 
     // Update GUI Window
-    cv::imshow(OPENCV_WINDOW, cv_ptr->image);
+    ROS_INFO_STREAM("N: Found " << circles.size() << " circles.");
+    cv::imshow("Normal", grey);
+
     cv::waitKey(3);
 
     // Output modified video stream
