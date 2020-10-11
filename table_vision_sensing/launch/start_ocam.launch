@@ -7,8 +7,8 @@
 
   <node name="background_removal" type="background_removal" pkg="table_vision_sensing" output="screen"/>
 
-  <!-- <node name="ball_tracking" type="ball_tracking" pkg="table_vision_sensing" output="screen">
-    <param name="blur_val" value="1"/>
-  </node> -->
+  <node name="ball_tracking" type="ball_tracking" pkg="table_vision_sensing" output="screen">
+    <remap from="/camera/image_rect" to="image_converter/fg_mask"/>
+  </node>
 
 </launch>

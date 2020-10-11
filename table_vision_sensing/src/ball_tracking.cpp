@@ -38,12 +38,12 @@ public:
 
     ROS_INFO_STREAM("Using blur of: " << blur_val_);
 
-    cv::namedWindow(OPENCV_WINDOW);
+    // cv::namedWindow(OPENCV_WINDOW);
   }
 
   ~ImageConverter()
   {
-    cv::destroyWindow(OPENCV_WINDOW);
+    // cv::destroyWindow(OPENCV_WINDOW);
   }
 
   void imageCb(const sensor_msgs::ImageConstPtr& msg)
@@ -61,30 +61,49 @@ public:
       return;
     }
 
+
     cv::Mat grey;
     cv::cvtColor(cv_ptr->image, grey, cv::COLOR_BGR2GRAY);
 
-    cv::medianBlur(grey, grey, blur_val_);
+    // blur(grey, grey, cv::Size(9,9));
+    // cv::Canny(grey, grey, 0, 255, 3);
 
-    std::vector<cv::Vec3f> circles;
-    cv::HoughCircles(grey, circles, cv::HOUGH_GRADIENT, 1, 4, 40, 22, 10, 18);
+    cv::Mat element = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(7,7));
 
-    for( size_t i = 0; i < circles.size(); i++ )
+    cv::dilate(grey, grey, element);
+
+
+    std::vector<std::vector<cv::Point> > contours;
+    std::vector<cv::Vec4i> hierarchy;
+
+    cv::findContours(grey, contours, hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+
+    cv::Mat drawing = cv::Mat::zeros(grey.size(), CV_8UC3);
+
+    for( size_t i = 0; i< contours.size(); i++ )
     {
-      cv::Vec3i c = circles[i];
-      cv::Point center = cv::Point(c[0], c[1]);
-      // circle center
-      cv::circle(cv_ptr->image, center, 1, cv::Scalar(0,100,100), 3, cv::LINE_AA);
-      cv::circle(grey, center, 1, cv::Scalar(0,100,100), 3, cv::LINE_AA);
-      // circle outline
-      int radius = c[2];
-      cv::circle(cv_ptr->image, center, radius, cv::Scalar(0,0,255), 3, cv::LINE_AA);
-      cv::circle(grey, center, radius, cv::Scalar(255,0,255), 3, cv::LINE_AA);
+        cv::Scalar red = cv::Scalar(256, 0, 0);
+        cv::drawContours(cv_ptr->image, contours, (int)i, red, 2, cv::LINE_8, hierarchy, 0);
     }
 
+    // std::vector<cv::Vec3f> circles;
+    // cv::HoughCircles(grey, circles, cv::HOUGH_GRADIENT, 1, 1, 1, 100, 0, 0);
+    //
+    // for( size_t i = 0; i < circles.size(); i++ )
+    // {
+    //   cv::Vec3i c = circles[i];
+    //   cv::Point center = cv::Point(c[0], c[1]);
+    //   // circle center
+    //   cv::circle(cv_ptr->image, center, 1, cv::Scalar(0,100,100), 3, cv::LINE_AA);
+    //   // circle outline
+    //   int radius = c[2];
+    //   cv::circle(cv_ptr->image, center, radius, cv::Scalar(0,0,255), 3, cv::LINE_AA);
+    // }
+    // ROS_INFO_STREAM("N: Found " << circles.size() << " circles.");
+
     // Update GUI Window
-    ROS_INFO_STREAM("N: Found " << circles.size() << " circles.");
-    cv::imshow("Normal", grey);
+    cv::imshow("grey", grey);
+    cv::imshow("Normal", cv_ptr->image);
 
     cv::waitKey(3);
 

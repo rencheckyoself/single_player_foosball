@@ -34,12 +34,10 @@ public:
   {
     // Subscrive to input video feed and publish output video feed
     image_sub_ = it_.subscribe("/camera/image_rect", 1, &ImageConverter::imageCb, this);
-    image_pub_ = it_.advertise("/image_converter/output_video", 1);
-
-    ros::NodeHandle n("~");
+    image_pub_ = it_.advertise("/image_converter/fg_mask", 1);
 
     // intialize background subtraction
-    pBackSub = cv::createBackgroundSubtractorKNN(500, 800.0, false);
+    pBackSub = cv::createBackgroundSubtractorKNN(250, 1000.0, false);
 
     // cv::namedWindow(OPENCV_WINDOW);
   }
@@ -64,19 +62,21 @@ public:
       return;
     }
 
-    cv::cvtColor(cv_ptr->image, cv_ptr->image, cv::COLOR_BGR2GRAY);
+    // cv::cvtColor(cv_ptr->image, cv_ptr->image, cv::COLOR_BGR2GRAY);
 
     pBackSub->apply(cv_ptr->image, fgMask);
 
     // Update GUI Window
-    cv::imshow("Original", cv_ptr->image);
-    cv::imshow("Mask", fgMask);
-
+    cv::imshow("Og", cv_ptr->image);
+    // cv::imshow("Mask", fgMask);
 
     cv::waitKey(3);
 
     // Output modified video stream
-    image_pub_.publish(cv_ptr->toImageMsg());
+
+    sensor_msgs::ImagePtr mask_out = cv_bridge::CvImage(std_msgs::Header(), "mono8", fgMask).toImageMsg();
+
+    image_pub_.publish(mask_out);
   }
 };
 
