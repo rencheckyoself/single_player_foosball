@@ -5,12 +5,10 @@
   </include>
   <node ns="camera" name="image_proc" pkg="image_proc" type="image_proc"/>
 
-  <node name="ball_tracking" type="ball_tracking" pkg="table_vision_sensing" output="screen">
-    <param name="blur_val" value="1"/> <!-- must be an odd number -->
-  </node>
+  <node name="background_removal" type="background_removal" pkg="table_vision_sensing" output="screen"/>
 
-  <node name="ball_tracking_eq" type="ball_tracking_eq" pkg="table_vision_sensing" output="screen">
-    <param name="blur_val" value="1"/> <!-- must be an odd number -->
-  </node>
+  <!-- <node name="ball_tracking" type="ball_tracking" pkg="table_vision_sensing" output="screen">
+    <param name="blur_val" value="1"/>
+  </node> -->
 
 </launch>

@@ -143,6 +143,8 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(${PROJECT_NAME}_ball_tracking src/ball_tracking.cpp)
 add_executable(${PROJECT_NAME}_ball_tracking_eq src/ball_tracking_eq.cpp)
+add_executable(${PROJECT_NAME}_background_removal src/background_removal.cpp)
+
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -150,12 +152,16 @@ add_executable(${PROJECT_NAME}_ball_tracking_eq src/ball_tracking_eq.cpp)
 ## e.g. "rosrun someones_pkg node" instead of "rosrun someones_pkg someones_pkg_node"
 set_target_properties(${PROJECT_NAME}_ball_tracking PROPERTIES OUTPUT_NAME ball_tracking PREFIX "")
 set_target_properties(${PROJECT_NAME}_ball_tracking_eq PROPERTIES OUTPUT_NAME ball_tracking_eq PREFIX "")
+set_target_properties(${PROJECT_NAME}_background_removal PROPERTIES OUTPUT_NAME background_removal PREFIX "")
+
 
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 add_dependencies(${PROJECT_NAME}_ball_tracking ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(${PROJECT_NAME}_ball_tracking_eq ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME}_background_removal ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
 
 
 ## Specify libraries to link a library or executable target against
@@ -165,6 +171,11 @@ target_link_libraries(${PROJECT_NAME}_ball_tracking
 )
 
 target_link_libraries(${PROJECT_NAME}_ball_tracking_eq
+  ${catkin_LIBRARIES}
+	${OpenCV_LIBRARIES}
+)
+
+target_link_libraries(${PROJECT_NAME}_background_removal
   ${catkin_LIBRARIES}
 	${OpenCV_LIBRARIES}
 )
@@ -185,7 +196,7 @@ target_link_libraries(${PROJECT_NAME}_ball_tracking_eq
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-install(TARGETS ${PROJECT_NAME}_ball_tracking ${PROJECT_NAME}_ball_tracking_eq
+install(TARGETS ${PROJECT_NAME}_ball_tracking ${PROJECT_NAME}_ball_tracking_eq ${PROJECT_NAME}_background_removal
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
