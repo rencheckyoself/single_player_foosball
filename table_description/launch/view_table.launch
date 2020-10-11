@@ -3,6 +3,7 @@
 
   <!-- load the urdf with xacro file-->
   <param name="robot_description" command="xacro '$(find table_description)/urdf/table.urdf.xacro'" />
+  
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
 
   <arg name="rviz_config" value="-d $(find table_description)/config/display.rviz" doc="The file path for the rviz config"/>

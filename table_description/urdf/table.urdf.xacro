@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="diff_drive">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="table">
 
   <xacro:property name="props" value="${load_yaml('$(find table_description)/config/table_params.yaml')}"/>
 
@@ -10,6 +10,7 @@
   <xacro:property name="player_width" value="${props['player_width']}"/>
   <xacro:property name="player_depth" value="${props['player_depth']}"/>
   <xacro:property name="player_height" value="${props['player_height']}"/>
+  <xacro:property name="player_mountingheight" value="${props['rod_mountingheight']}"/>
 
   <xacro:property name="ball_diameter" value="${props['ball_diameter']}"/>
 
@@ -28,20 +29,28 @@
   <xacro:property name="wall_thickness" value="0.015"/>
 
   <!-- Macro to create a player -->
-  <xacro:macro name="player" params="name r g b">
-    <link name="${name}">
-      <geometry>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-        <box size="${player_height} ${player_width} ${player_depth}"/>
-        <material name="White">
-          <color rgba="r g b 1.0"/>
+  <xacro:macro name="player" params="rod_name player_num r g b">
+    <link name="${rod_name}_player_${player_num}">
+      <visual>
+        <origin xyz="0 0 ${player_height/2 - player_mountingheight}" rpy="0 0 0"/>
+        <geometry>
+          <box size="${player_depth} ${player_width} ${player_height}"/>
+        </geometry>
+        <material name="${rod_name}">
+          <color rgba="${r} ${g} ${b} 1.0"/>
         </material>
-      </geometry>
+      </visual>
     </link>
+
+    <joint name="${rod_name}_player_${player_num}_joint" type="fixed">
+      <parent link="${name}_p${player_num}_mount"/>
+      <child link="${rod_name}_player_${player_num}"/>
+    </joint>
+
   </xacro:macro>
 
   <!-- Macro to create a player rod -->
-  <xacro:macro name="player_rod" params="name dir dist num_players r g b">
+  <xacro:macro name="player_rod" params="name dir dist r g b">
     <link name="${name}_mount_c">
       <origin xyz="0 0 0" rpy="0 0 0"/>
     </link>
@@ -81,6 +90,33 @@
       <axis xyz="0 1 0"/>
       <limit upper="0.05" lower="-0.05" effort="10" velocity="2"/>
     </joint>
+
+    <!-- attach players to each rod -->
+    <link name="${name}_p1_mount"/>
+    <link name="${name}_p2_mount"/>
+    <link name="${name}_p3_mount"/>
+
+    <joint name="${name}_p1_mount_joint" type="fixed">
+      <origin xyz="0 0.061 0" rpy="0 0 0"/>
+      <parent link="${name}_rod"/>
+      <child link="${name}_p1_mount"/>
+    </joint>
+
+    <joint name="${name}_p2_mount_joint" type="fixed">
+      <origin xyz="0 0.141 0" rpy="0 0 0"/>
+      <parent link="${name}_rod"/>
+      <child link="${name}_p2_mount"/>
+    </joint>
+
+    <joint name="${name}_p3_mount_joint" type="fixed">
+      <origin xyz="0 0.221 0" rpy="0 0 0"/>
+      <parent link="${name}_rod"/>
+      <child link="${name}_p3_mount"/>
+    </joint>
+
+    <xacro:player rod_name="${name}" player_num="1" r="${r}" g="${g}" b="${b}"/>
+    <xacro:player rod_name="${name}" player_num="2" r="${r}" g="${g}" b="${b}"/>
+    <xacro:player rod_name="${name}" player_num="3" r="${r}" g="${g}" b="${b}"/>
 
   </xacro:macro>
 
@@ -149,8 +185,7 @@
     </joint>
   </xacro:macro>
 
-
-  <!-- START BUILD THE URDF MODEL -->
+  <!-- START BUILDING THE URDF MODEL -->
   <link name="base_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </link>
@@ -178,11 +213,10 @@
   <xacro:end_wall side="white" dir="1"/>
   <xacro:end_wall side="grey" dir="-1"/>
 
-  <xacro:player_rod name="white_attack" dir="1" dist="${attack_rod_distance}" num_players="3" r="1" g="1" b="1"/>
-  <xacro:player_rod name="white_goalie" dir="-1" dist="${goalie_rod_distance}" num_players="3" r="1" g="1" b="1"/>
+  <xacro:player_rod name="white_attack" dir="1" dist="${attack_rod_distance}" r="1" g="1" b="1"/>
+  <xacro:player_rod name="white_goalie" dir="-1" dist="${goalie_rod_distance}" r="1" g="1" b="1"/>
 
-  <xacro:player_rod name="grey_attack" dir="-1" dist="${attack_rod_distance}" num_players="3" r="1" g="1" b="1"/>
-  <xacro:player_rod name="grey_goalie" dir="1" dist="${goalie_rod_distance}" num_players="3" r="1" g="1" b="1"/>
-
+  <xacro:player_rod name="grey_attack" dir="-1" dist="${attack_rod_distance}" r="0.5" g="0.5" b="0.5"/>
+  <xacro:player_rod name="grey_goalie" dir="1" dist="${goalie_rod_distance}" r="0.5" g="0.5" b="0.5"/>
 
 </robot>
