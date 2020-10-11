@@ -5,11 +5,11 @@
   <param name="robot_description" command="xacro '$(find table_description)/urdf/table.urdf.xacro'" />
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
 
-  <!-- <arg name="rviz_config" value="-d $(find nuturtle_description)/config/view_urdf.rviz" doc="The file path for the rviz config"/> -->
+  <arg name="rviz_config" value="-d $(find table_description)/config/display.rviz" doc="The file path for the rviz config"/>
 
   <!-- The joint state publisher will be launched with a gui -->
-  <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui">
+  <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui"/>
 
   <!-- Launch rviz as a required node -->
-  <node name="rviz" pkg="rviz" type="rviz" required="true"/>
+  <node name="rviz" pkg="rviz" type="rviz" args="$(arg rviz_config)" required="true"/>
 </launch>

@@ -5,18 +5,27 @@
 
   <xacro:property name="rod_length" value="${props['rod_length']}"/>
   <xacro:property name="rod_diameter" value="${props['rod_diameter']}"/>
+  <xacro:property name="rod_mountingheight" value="${props['rod_mountingheight']}"/>
+
   <xacro:property name="player_width" value="${props['player_width']}"/>
   <xacro:property name="player_depth" value="${props['player_depth']}"/>
   <xacro:property name="player_height" value="${props['player_height']}"/>
+
   <xacro:property name="ball_diameter" value="${props['ball_diameter']}"/>
+
   <xacro:property name="field_width" value="${props['field_width']}"/>
   <xacro:property name="field_length" value="${props['field_length']}"/>
+  <xacro:property name="field_thickness" value="0.005"/>
+
   <xacro:property name="goal_width" value="${props['goal_width']}"/>
   <xacro:property name="goal_height" value="${props['goal_height']}"/>
+
   <xacro:property name="wall_height" value="${props['wall_height']}"/>
 
+  <xacro:property name="attack_rod_distance" value="${props['attack_rod_distance']}"/>
+  <xacro:property name="goalie_rod_distance" value="${props['goalie_rod_distance']}"/>
+
   <xacro:property name="wall_thickness" value="0.015"/>
-  <xacro:property name="field_thickness" value="0.005"/>
 
   <!-- Macro to create a player -->
   <xacro:macro name="player" params="name r g b">
@@ -32,31 +41,123 @@
   </xacro:macro>
 
   <!-- Macro to create a player rod -->
-  <xacro:macro name="player_rod" params="name r g b">
-    <link name="${name}">
-      <visual>
-        <geometry>
-          <cylinder length="${rod_length}" radius="${rod_diameter}/2"/>
-        </geometry>
-      </visual>
-  </xacro:macro>
+  <xacro:macro name="player_rod" params="name dir dist num_players r g b">
+    <link name="${name}_mount_c">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </link>
 
-  <xacro:macro name="side_wall" params="side">
-    <link name="${name}_side_wall">
+    <link name="${name}_mount_p">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </link>
+
+    <link name="${name}_rod">
       <visual>
+        <origin xyz="0 ${field_width/2} 0" rpy="0 ${pi/2} ${pi/2}"/>
         <geometry>
-          <box size="${field_length} ${field_width} ${wall_height}"/>
+          <cylinder length="${rod_length}" radius="${rod_diameter/2}"/>
         </geometry>
+        <material name="Grey">
+          <color rgba="0.5 0.5 0.5 1"/>
+        </material>
       </visual>
     </link>
+
+    <joint name="${name}_mount_joint_c" type="fixed">
+      <origin xyz="${dir*dist} ${-field_width/2} ${rod_mountingheight}"/>
+      <parent link="field"/>
+      <child link="${name}_mount_c"/>
+    </joint>
+
+    <joint name="${name}_mount_joint_p" type="continuous">
+      <parent link="${name}_mount_c"/>
+      <child link="${name}_mount_p"/>
+      <axis xyz="0 1 0"/>
+    </joint>
+
+    <joint name="${name}_rod_joint_p" type="prismatic">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <parent link="${name}_mount_p"/>
+      <child link="${name}_rod"/>
+      <axis xyz="0 1 0"/>
+      <limit upper="0.05" lower="-0.05" effort="10" velocity="2"/>
+    </joint>
+
   </xacro:macro>
 
+  <!-- Macro to create the left and right wall panels -->
+  <xacro:macro name="side_wall" params="side dir">
+    <link name="${side}_side_wall">
+      <visual>
+        <origin xyz="0 ${dir*wall_thickness/2} ${wall_height/2}" rpy="0 0 0"/>
+        <geometry>
+          <box size="${field_length + wall_thickness*2} ${wall_thickness} ${wall_height}"/>
+        </geometry>
+        <material name="Soft Black">
+          <color rgba="0.1 0.1 0.1 1"/>
+        </material>
+      </visual>
+    </link>
+
+    <joint name="${side}_side_wall_joint" type="fixed">
+      <origin xyz="0 ${dir*field_width/2} 0" rpy="0 0 0" />
+      <parent link="field"/>
+      <child link="${side}_side_wall"/>
+    </joint>
+  </xacro:macro>
+
+  <!-- Macros to create the goal panels with a cut out for the goal -->
+  <xacro:macro name="end_wall" params="side dir">
+    <link name="${side}_end_wall_goal">
+      <visual>
+        <origin xyz="${dir*wall_thickness/2} 0 ${(wall_height+goal_height)/2}" rpy="0 0 0"/>
+        <geometry>
+          <box size="${wall_thickness} ${goal_width} ${wall_height-goal_height}"/>
+        </geometry>
+        <material name="Soft Black">
+          <color rgba="0.1 0.1 0.1 1"/>
+        </material>
+      </visual>
+    </link>
+
+    <joint name="${side}_end_wall_joint" type="fixed">
+      <origin xyz="${dir*field_length/2} 0 ${0}" rpy="0 0 0" />
+      <parent link="field"/>
+      <child link="${side}_end_wall_goal"/>
+    </joint>
+
+    <xacro:end_wall_segment end_color="${side}" end_dir="${dir}" side="right" dir="1"/>
+    <xacro:end_wall_segment end_color="${side}" end_dir="${dir}"  side="left" dir="-1"/>
+
+  </xacro:macro>
+  <xacro:macro name="end_wall_segment" params="end_color end_dir side dir">
+    <link name="${end_color}_end_wall_${side}">
+      <visual>
+        <origin xyz="${end_dir*wall_thickness/2} 0 ${wall_height/2}" rpy="0 0 0"/>
+        <geometry>
+          <box size="${wall_thickness} ${(field_width-goal_width)/2} ${wall_height}"/>
+        </geometry>
+        <material name="Soft Black">
+          <color rgba="0.1 0.1 0.1 1"/>
+        </material>
+      </visual>
+    </link>
+
+    <joint name="${end_color}_end_wall_${side}_joint" type="fixed">
+      <origin xyz="0 ${dir*(goal_width/2 + (field_width-goal_width)/4)} 0" rpy="0 0 0" />
+      <parent link="${end_color}_end_wall_goal"/>
+      <child link="${end_color}_end_wall_${side}"/>
+    </joint>
+  </xacro:macro>
+
+
+  <!-- START BUILD THE URDF MODEL -->
   <link name="base_link">
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </link>
 
   <link name="field">
     <visual>
+      <origin xyz="0 0 ${-field_thickness/2}" rpy="0 0 0"/>
       <geometry>
         <box size="${field_length} ${field_width} ${field_thickness}"/>
       </geometry>
@@ -65,11 +166,23 @@
       </material>
     </visual>
   </link>
-
   <joint name="field_joint" type="fixed">
     <origin xyz="0 0 0" rpy="0 0 0" />
     <parent link="base_link"/>
     <child link="field"/>
   </joint>
-  
+
+  <xacro:side_wall side="right" dir="1"/>
+  <xacro:side_wall side="left" dir="-1"/>
+
+  <xacro:end_wall side="white" dir="1"/>
+  <xacro:end_wall side="grey" dir="-1"/>
+
+  <xacro:player_rod name="white_attack" dir="1" dist="${attack_rod_distance}" num_players="3" r="1" g="1" b="1"/>
+  <xacro:player_rod name="white_goalie" dir="-1" dist="${goalie_rod_distance}" num_players="3" r="1" g="1" b="1"/>
+
+  <xacro:player_rod name="grey_attack" dir="-1" dist="${attack_rod_distance}" num_players="3" r="1" g="1" b="1"/>
+  <xacro:player_rod name="grey_goalie" dir="1" dist="${goalie_rod_distance}" num_players="3" r="1" g="1" b="1"/>
+
+
 </robot>

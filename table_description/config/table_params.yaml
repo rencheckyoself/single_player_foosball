@@ -1,21 +1,27 @@
 # all dimensions are in meters
 
 # Visual Parameters
-rod_length: 0.410
-rod_diameter: 0.0077
+rod_length: 0.410 # length of the rod
+rod_diameter: 0.0077 # diameter of the rod
 
-player_width: 0.014
-player_depth: 0.011
-player_height: 0.070
+rod_mountingheight: 0.049 # mounting height of the rods from the surface of the field
 
-ball_diameter: 0.0274
+attack_rod_distance: 0.050 # distance from the centerline of the field to the attack rod
+goalie_rod_distance: 0.145 # distance from the centerline of the field to the goalie rod
 
-field_length: 0.402
-field_width: 0.285
+player_width: 0.014 # width of the kicking surface of the player
+player_depth: 0.011 # thickess of the kicking surface of the player
+player_height: 0.070 # height of the entire player
+player_moutningheight: 0.042 # height of the mounting axis of the player to the rod from the bottom of the player
 
-wall_height: 0.062
+ball_diameter: 0.0274 # ball diameter
 
-goal_height: 0.040
-goal_width: 0.080
+field_length: 0.402 # field length from goal to goal
+field_width: 0.285 # field width from side to side
+
+wall_height: 0.062 # height of the side walls
+
+goal_height: 0.040 # height of the goal opening
+goal_width: 0.080 # width of the goal opening
 
 # Interial Parameters
