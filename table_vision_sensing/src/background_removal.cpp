@@ -37,7 +37,7 @@ public:
     image_pub_ = it_.advertise("/image_converter/fg_mask", 1);
 
     // intialize background subtraction
-    pBackSub = cv::createBackgroundSubtractorKNN(250, 1000.0, false);
+    pBackSub = cv::createBackgroundSubtractorKNN(350, 10000.0, false);
 
     // cv::namedWindow(OPENCV_WINDOW);
   }
@@ -63,6 +63,8 @@ public:
     }
 
     // cv::cvtColor(cv_ptr->image, cv_ptr->image, cv::COLOR_BGR2GRAY);
+
+    
 
     pBackSub->apply(cv_ptr->image, fgMask);
 

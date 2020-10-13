@@ -18,6 +18,8 @@
 
 static const std::string OPENCV_WINDOW = "Image window";
 
+static const float PI = 3.14195;
+
 class ImageConverter
 {
   ros::NodeHandle nh_;
@@ -61,7 +63,6 @@ public:
       return;
     }
 
-
     cv::Mat grey;
     cv::cvtColor(cv_ptr->image, grey, cv::COLOR_BGR2GRAY);
 
@@ -72,18 +73,53 @@ public:
 
     cv::dilate(grey, grey, element);
 
-
-    std::vector<std::vector<cv::Point> > contours;
+    std::vector<std::vector<cv::Point>> contours;
     std::vector<cv::Vec4i> hierarchy;
 
     cv::findContours(grey, contours, hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
-    cv::Mat drawing = cv::Mat::zeros(grey.size(), CV_8UC3);
+    std::vector<std::vector<cv::Point> > contours_poly( contours.size() );
+    std::vector<cv::Rect> boundRect( contours.size() );
+    std::vector<cv::Point2f> centers( contours.size() );
+    std::vector<float> radius( contours.size() );
+
+    std::vector<cv::RotatedRect> minEllipse( contours.size() );
+
+    std::vector<std::vector<cv::Point>>hull( contours.size() );
 
     for( size_t i = 0; i< contours.size(); i++ )
     {
-        cv::Scalar red = cv::Scalar(256, 0, 0);
-        cv::drawContours(cv_ptr->image, contours, (int)i, red, 2, cv::LINE_8, hierarchy, 0);
+        cv::approxPolyDP(contours[i], contours_poly[i], 3, true);
+        cv::minEnclosingCircle(contours_poly[i], centers[i], radius[i]);
+        if(contours.at(i).size() > 4) minEllipse.at(i) = cv::fitEllipse(contours.at(i));
+        cv::convexHull(contours.at(i), hull.at(i));
+    }
+
+    for( size_t i = 0; i< contours.size(); i++ )
+    {
+        cv::Scalar blue = cv::Scalar(256, 0, 0);
+        cv::Scalar green = cv::Scalar(0, 256, 0);
+        cv::Scalar red = cv::Scalar(0, 0, 256);
+
+        cv::drawContours(cv_ptr->image, contours, (int)i, blue, 2, cv::LINE_8, hierarchy, 0);
+
+        double majora = std::max(minEllipse.at(i).size.height, minEllipse.at(i).size.width);
+        double minora = std::min(minEllipse.at(i).size.height, minEllipse.at(i).size.width);
+
+        // if(radius.at(i) <= 25 && radius.at(i) >= 18 && minora/majora > 0.8)
+        // {
+        //   cv::ellipse(cv_ptr->image, minEllipse.at(i), red);
+        //   cv::circle(cv_ptr->image, centers[i], radius[i], green, 2);
+        // }
+
+        if(radius.at(i) <= 25 && radius.at(i) >= 18)
+        {
+          if(std::abs(cv::contourArea(contours.at(i)) - cv::contourArea(hull.at(i))) < 100)
+          {
+            cv::drawContours(cv_ptr->image, hull, (int)i, red, 2);
+            cv::circle(cv_ptr->image, centers[i], radius[i], green, 2);
+          }
+        }
     }
 
     // std::vector<cv::Vec3f> circles;
@@ -102,8 +138,8 @@ public:
     // ROS_INFO_STREAM("N: Found " << circles.size() << " circles.");
 
     // Update GUI Window
-    cv::imshow("grey", grey);
-    cv::imshow("Normal", cv_ptr->image);
+    cv::imshow("Dilated Mask", grey);
+    cv::imshow("Mask", cv_ptr->image);
 
     cv::waitKey(3);
 
