@@ -12,6 +12,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   cv_bridge
+  image_geometry
   image_transport
   roscpp
   sensor_msgs
@@ -112,7 +113,7 @@ find_package(OpenCV)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES table_vision_sensing
- CATKIN_DEPENDS   cv_bridge image_transport roscpp sensor_msgs std_msgs
+ CATKIN_DEPENDS   cv_bridge image_geometry image_transport roscpp sensor_msgs std_msgs
 #  DEPENDS system_lib
 )
 

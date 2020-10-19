@@ -51,6 +51,7 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <depend>cv_bridge</depend>
+  <depend>image_geometry</depend>
   <depend>image_transport</depend>
   <depend>roscpp</depend>
   <depend>std_msgs</depend>

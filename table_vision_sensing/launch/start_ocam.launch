@@ -5,10 +5,12 @@
   </include>
   <node ns="camera" name="image_proc" pkg="image_proc" type="image_proc"/>
 
-  <node name="background_removal" type="background_removal" pkg="table_vision_sensing" output="screen"/>
+  <node name="background_removal" type="background_removal" pkg="table_vision_sensing" output="screen">
+    <remap from="/image_converter/fg_mask" to="/camera/fg_mask"/>
+  </node>
 
   <node name="ball_tracking" type="ball_tracking" pkg="table_vision_sensing" output="screen">
-    <remap from="/camera/image_rect" to="image_converter/fg_mask"/>
+    <remap from="/camera/image_rect" to="camera/fg_mask"/>
   </node>
 
 </launch>

@@ -33,7 +33,7 @@ public:
   ImageConverter() : it_(nh_)
   {
     // Subscrive to input video feed and publish output video feed
-    image_sub_ = it_.subscribe("/camera/image_rect", 1, &ImageConverter::imageCb, this);
+    image_sub_ = it_.subscribe("/camera/image_rect_color", 1, &ImageConverter::imageCb, this);
     image_pub_ = it_.advertise("/image_converter/fg_mask", 1);
 
     // intialize background subtraction
@@ -62,15 +62,17 @@ public:
       return;
     }
 
-    // cv::cvtColor(cv_ptr->image, cv_ptr->image, cv::COLOR_BGR2GRAY);
-
-    
+    // cv::cvtColor(cv_ptr->image, cv_ptr->image, cv::COLOR_BGR2HSV);
 
     pBackSub->apply(cv_ptr->image, fgMask);
 
     // Update GUI Window
-    cv::imshow("Og", cv_ptr->image);
-    // cv::imshow("Mask", fgMask);
+    cv::imshow("Rectified", cv_ptr->image);
+
+    cv::Mat masked_image;
+    cv::cvtColor(fgMask, masked_image, cv::COLOR_GRAY2BGR);
+    cv::bitwise_and(cv_ptr->image, masked_image, masked_image);
+    cv::imshow("Masked Image", masked_image);
 
     cv::waitKey(3);
 

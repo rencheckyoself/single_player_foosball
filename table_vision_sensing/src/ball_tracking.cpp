@@ -11,8 +11,11 @@
 
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
-#include <cv_bridge/cv_bridge.h>
+#include <image_geometry/pinhole_camera_model.h>
+
 #include <sensor_msgs/image_encodings.h>
+
+#include <cv_bridge/cv_bridge.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
@@ -26,17 +29,23 @@ class ImageConverter
   image_transport::ImageTransport it_;
   image_transport::Subscriber image_sub_;
   image_transport::Publisher image_pub_;
+  ros::Subscriber camera_info_sub;
   int blur_val_ = 5;
+
+  image_geometry::PinholeCameraModel cam_model_;
 
 public:
   ImageConverter() : it_(nh_)
   {
+    ros::NodeHandle np("~");
+    ros::NodeHandle n;
     // Subscrive to input video feed and publish output video feed
     image_sub_ = it_.subscribe("/camera/image_rect", 1, &ImageConverter::imageCb, this);
     image_pub_ = it_.advertise("/image_converter/output_video", 1);
 
-    ros::NodeHandle n("~");
-    n.param("blur_val", blur_val_, 5);
+    camera_info_sub = n.subscribe("/camera/camera_info", 1, &ImageConverter::cameraInfoCb, this);
+
+    np.param("blur_val", blur_val_, 5);
 
     ROS_INFO_STREAM("Using blur of: " << blur_val_);
 
@@ -46,6 +55,12 @@ public:
   ~ImageConverter()
   {
     // cv::destroyWindow(OPENCV_WINDOW);
+  }
+
+  void cameraInfoCb(const sensor_msgs::CameraInfoConstPtr& info_msg)
+  {
+    // ROS_INFO_STREAM("Set Camera Model");
+    cam_model_.fromCameraInfo(info_msg);
   }
 
   void imageCb(const sensor_msgs::ImageConstPtr& msg)
@@ -69,9 +84,11 @@ public:
     // blur(grey, grey, cv::Size(9,9));
     // cv::Canny(grey, grey, 0, 255, 3);
 
-    cv::Mat element = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(7,7));
+    cv::Mat e_element = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5,5));
+    cv::Mat d_element = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(7,7));
 
-    cv::dilate(grey, grey, element);
+    cv::dilate(grey, grey, d_element);
+    // cv::erode(grey, grey, e_element);
 
     std::vector<std::vector<cv::Point>> contours;
     std::vector<cv::Vec4i> hierarchy;
@@ -90,7 +107,7 @@ public:
     for( size_t i = 0; i< contours.size(); i++ )
     {
         cv::approxPolyDP(contours[i], contours_poly[i], 3, true);
-        cv::minEnclosingCircle(contours_poly[i], centers[i], radius[i]);
+        cv::minEnclosingCircle(contours[i], centers[i], radius[i]);
         if(contours.at(i).size() > 4) minEllipse.at(i) = cv::fitEllipse(contours.at(i));
         cv::convexHull(contours.at(i), hull.at(i));
     }
@@ -114,12 +131,23 @@ public:
 
         if(radius.at(i) <= 25 && radius.at(i) >= 18)
         {
-          if(std::abs(cv::contourArea(contours.at(i)) - cv::contourArea(hull.at(i))) < 100)
+          double area = std::abs(cv::contourArea(contours.at(i)) - cv::contourArea(hull.at(i)));
+          if( area < 100)
           {
+            ROS_INFO_STREAM("Area: " << area);
             cv::drawContours(cv_ptr->image, hull, (int)i, red, 2);
             cv::circle(cv_ptr->image, centers[i], radius[i], green, 2);
           }
         }
+    }
+
+    cv::Point3d ball_pos;
+
+    if(contours.size() == 1)
+    {
+      ball_pos = cam_model_.projectPixelTo3dRay(centers.at(0));
+
+      ROS_INFO_STREAM("Ball Coordinates: " << ball_pos.x << ", " << ball_pos.y << ", " << ball_pos.z);
     }
 
     // std::vector<cv::Vec3f> circles;
