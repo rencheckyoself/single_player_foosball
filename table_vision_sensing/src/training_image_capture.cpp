@@ -37,6 +37,8 @@ public:
     np.getParam("file_path", file_path);
 
     full_directory = package_path + file_path;
+
+    ROS_INFO_STREAM("ImCa: Using Directory:" << full_directory);
   }
 
   ~ImageConverter()
