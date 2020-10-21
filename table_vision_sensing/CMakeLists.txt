@@ -145,6 +145,8 @@ include_directories(
 add_executable(${PROJECT_NAME}_ball_tracking src/ball_tracking.cpp)
 add_executable(${PROJECT_NAME}_ball_tracking_eq src/ball_tracking_eq.cpp)
 add_executable(${PROJECT_NAME}_background_removal src/background_removal.cpp)
+add_executable(${PROJECT_NAME}_cascade_classifier src/cascade_classifier.cpp)
+add_executable(${PROJECT_NAME}_training_image_capture src/training_image_capture.cpp)
 
 
 ## Rename C++ executable without prefix
@@ -154,7 +156,8 @@ add_executable(${PROJECT_NAME}_background_removal src/background_removal.cpp)
 set_target_properties(${PROJECT_NAME}_ball_tracking PROPERTIES OUTPUT_NAME ball_tracking PREFIX "")
 set_target_properties(${PROJECT_NAME}_ball_tracking_eq PROPERTIES OUTPUT_NAME ball_tracking_eq PREFIX "")
 set_target_properties(${PROJECT_NAME}_background_removal PROPERTIES OUTPUT_NAME background_removal PREFIX "")
-
+set_target_properties(${PROJECT_NAME}_cascade_classifier PROPERTIES OUTPUT_NAME cascade_classifier PREFIX "")
+set_target_properties(${PROJECT_NAME}_training_image_capture PROPERTIES OUTPUT_NAME training_image_capture PREFIX "")
 
 
 ## Add cmake target dependencies of the executable
@@ -162,7 +165,8 @@ set_target_properties(${PROJECT_NAME}_background_removal PROPERTIES OUTPUT_NAME 
 add_dependencies(${PROJECT_NAME}_ball_tracking ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(${PROJECT_NAME}_ball_tracking_eq ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(${PROJECT_NAME}_background_removal ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
+add_dependencies(${PROJECT_NAME}_cascade_classifier ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME}_training_image_capture ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 
 ## Specify libraries to link a library or executable target against
@@ -177,6 +181,16 @@ target_link_libraries(${PROJECT_NAME}_ball_tracking_eq
 )
 
 target_link_libraries(${PROJECT_NAME}_background_removal
+  ${catkin_LIBRARIES}
+	${OpenCV_LIBRARIES}
+)
+
+target_link_libraries(${PROJECT_NAME}_cascade_classifier
+  ${catkin_LIBRARIES}
+	${OpenCV_LIBRARIES}
+)
+
+target_link_libraries(${PROJECT_NAME}_training_image_capture
   ${catkin_LIBRARIES}
 	${OpenCV_LIBRARIES}
 )
@@ -197,7 +211,7 @@ target_link_libraries(${PROJECT_NAME}_background_removal
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-install(TARGETS ${PROJECT_NAME}_ball_tracking ${PROJECT_NAME}_ball_tracking_eq ${PROJECT_NAME}_background_removal
+install(TARGETS ${PROJECT_NAME}_ball_tracking ${PROJECT_NAME}_ball_tracking_eq ${PROJECT_NAME}_background_removal ${PROJECT_NAME}_cascade_classifier ${PROJECT_NAME}_training_image_capture
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
@@ -217,11 +231,7 @@ install(TARGETS ${PROJECT_NAME}_ball_tracking ${PROJECT_NAME}_ball_tracking_eq $
 # )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
+install(DIRECTORY cascade_data/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/cascade_data)
 
 #############
 ## Testing ##

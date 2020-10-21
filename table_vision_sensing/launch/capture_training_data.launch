@@ -1,0 +1,9 @@
+<launch>
+
+  <include file="$(find table_vision_sensing)/launch/start_ocam.launch"/>
+
+  <node name="training_image_capture" type="training_image_capture" pkg="table_vision_sensing" output="screen">
+    <param name="file_path" value="/training_data/background/"/>
+  </node>
+
+</launch>
