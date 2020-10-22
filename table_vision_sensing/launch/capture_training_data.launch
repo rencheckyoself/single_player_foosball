@@ -1,9 +1,19 @@
 <launch>
 
+  <arg name="image_group" default="positives" doc="The name of the subdirectory and info file to use for the images"/>
+
   <include file="$(find table_vision_sensing)/launch/start_ocam.launch"/>
 
-  <node name="training_image_capture" type="training_image_capture" pkg="table_vision_sensing" output="screen">
-    <param name="file_path" value="/training_data/background/"/>
+  <node name="training_image_capture_BALL" type="training_image_capture" pkg="table_vision_sensing" output="screen">
+    <param name="file_path" value="training_data/"/> <!-- relative to the package -->
+    <param name="image_group" value="$(arg image_group)"/>
+    <param name="generate_annotation" value="false"/>
+  </node>
+
+  <node name="training_image_capture_BG" type="training_image_capture" pkg="table_vision_sensing" output="screen">
+    <param name="file_path" value="training_data/"/> <!-- relative to the package -->
+    <param name="image_group" value="background"/>
+    <param name="generate_annotation" value="true"/>
   </node>
 
 </launch>
