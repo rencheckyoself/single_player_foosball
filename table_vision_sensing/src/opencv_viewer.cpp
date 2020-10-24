@@ -7,6 +7,7 @@
 #include <sensor_msgs/image_encodings.h>
 #include <geometry_msgs/Point.h>
 
+
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -19,13 +20,10 @@ class ImageConverter
   image_transport::Subscriber image_sub_;
   image_transport::Publisher image_pub_;
 
-  ros::Publisher ball_pos;
+  ros::Time last_frame_time;
+  ros::Time current_frame_time;
 
-  image_geometry::PinholeCameraModel cam_model_;
-
-  cv::CascadeClassifier ball_finder;
-
-  ros::Time last_frame;
+  cv::Point ball_loc;
 
 public:
   ImageConverter() : it_(nh_)
@@ -35,22 +33,16 @@ public:
 
     // Subscrive to input video feed and publish output video feed
     image_sub_ = it_.subscribe("/camera/image_rect_color", 1, &ImageConverter::imageCb, this);
+    image_pub_ = it_.advertise("/image_converter/output_video", 1);
 
-    ball_pos = n.advertise<geometry_msgs::Point>("BallPostion", 1);
-
-    // Load the trained model
-    if(!ball_finder.load("/home/michaelrencheck/FinalProject/src/table_vision_sensing/cascade_data/cascade.xml"))
-    {
-      ROS_ERROR_STREAM("Casade not loaded properly");
-      ros::shutdown();
-    }
+    current_frame_time = ros::Time::now();
+    last_frame_time = ros::Time::now();
   }
 
   ~ImageConverter() {}
 
   void imageCb(const sensor_msgs::ImageConstPtr& msg)
   {
-
     cv_bridge::CvImagePtr cv_ptr;
 
     // Attempt to copy the ROS image into opencv image
@@ -64,22 +56,27 @@ public:
       return;
     }
 
-    std::vector<cv::Rect> detected_balls;
-    std::vector<double> weights;
-    std::vector<int> levels;
+    int fps = 1.0 / (msg->header.stamp - last_frame_time).toSec();
+    last_frame_time = msg->header.stamp;
 
-    ball_finder.detectMultiScale(cv_ptr->image, detected_balls, levels, weights, 1.1, 3, 0, cv::Size(), cv::Size(50,50), true);
+    cv::circle(cv_ptr->image, ball_loc, 2, cv::Scalar(255,0,0), -1);
 
-    geometry_msgs::Point ball_loc;
+    cv::putText(cv_ptr->image, std::to_string(fps), cv::Point(0,30), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 1);
 
-    if(weights.size() > 0)
-    {
-      int max_index = std::distance( weights.begin(), std::max_element(weights.begin(), weights.end()));
-      ball_loc.x = detected_balls.at(max_index).x + detected_balls.at(max_index).width/2;
-      ball_loc.y = detected_balls.at(max_index).y + detected_balls.at(max_index).height/2;
-    }
+    // Update GUI Window
+    cv::imshow("Overhead Camera", cv_ptr->image);
 
-    ball_pos.publish(ball_loc);
+    cv::waitKey(1);
+
+    // Output modified video stream
+    image_pub_.publish(cv_ptr->toImageMsg());
+
+  }
+
+  void ballPosCB(const geometry_msgs::Point& msg)
+  {
+    ball_loc.x = msg.x;
+    ball_loc.y = msg.y;
   }
 
 };

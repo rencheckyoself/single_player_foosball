@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>table_vision_sensing</name>
+  <name>table_gameplay_ai</name>
   <version>0.0.0</version>
-  <description>Package containing all of the image processing and computer vision</description>
+  <description>The table_gameplay_ai package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
@@ -19,7 +19,7 @@
   <!-- Url tags are optional, but multiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/table_vision_sensing</url> -->
+  <!-- <url type="website">http://wiki.ros.org/table_gameplay_ai</url> -->
 
 
   <!-- Author tags are optional, multiple are allowed, one per tag -->
@@ -49,14 +49,10 @@
   <!-- Use doc_depend for packages you need only for building documentation: -->
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <build_export_depend>roscpp</build_export_depend>
+  <exec_depend>roscpp</exec_depend>
 
-  <depend>cv_bridge</depend>
-  <depend>geometry_msgs</depend>
-  <depend>image_geometry</depend>
-  <depend>image_transport</depend>
-  <depend>roscpp</depend>
-  <depend>std_msgs</depend>
-  <depend>sensor_msgs</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

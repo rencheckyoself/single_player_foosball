@@ -1,26 +1,15 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(table_vision_sensing)
+project(table_gameplay_ai)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-Wall -Wextra -Wno-psabi)
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+# add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  cv_bridge
-  geometry_msgs
-  image_geometry
-  image_transport
   roscpp
-  sensor_msgs
-  std_msgs
 )
-
-find_package(OpenCV)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -113,8 +102,8 @@ find_package(OpenCV)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES table_vision_sensing
- CATKIN_DEPENDS   cv_bridge geometry_msgs image_geometry image_transport roscpp sensor_msgs std_msgs
+#  LIBRARIES table_gameplay_ai
+#  CATKIN_DEPENDS roscpp
 #  DEPENDS system_lib
 )
 
@@ -127,12 +116,11 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
-  ${OpenCV_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/table_vision_sensing.cpp
+#   src/${PROJECT_NAME}/table_gameplay_ai.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -143,70 +131,22 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(${PROJECT_NAME}_ball_tracking src/ball_tracking.cpp)
-add_executable(${PROJECT_NAME}_ball_tracking_eq src/ball_tracking_eq.cpp)
-add_executable(${PROJECT_NAME}_background_removal src/background_removal.cpp)
-add_executable(${PROJECT_NAME}_cascade_classifier src/cascade_classifier.cpp)
-add_executable(${PROJECT_NAME}_training_image_capture src/training_image_capture.cpp)
-add_executable(${PROJECT_NAME}_opencv_viewer src/opencv_viewer.cpp)
-
-
+# add_executable(${PROJECT_NAME}_node src/table_gameplay_ai_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
 ## e.g. "rosrun someones_pkg node" instead of "rosrun someones_pkg someones_pkg_node"
-set_target_properties(${PROJECT_NAME}_ball_tracking PROPERTIES OUTPUT_NAME ball_tracking PREFIX "")
-set_target_properties(${PROJECT_NAME}_ball_tracking_eq PROPERTIES OUTPUT_NAME ball_tracking_eq PREFIX "")
-set_target_properties(${PROJECT_NAME}_background_removal PROPERTIES OUTPUT_NAME background_removal PREFIX "")
-set_target_properties(${PROJECT_NAME}_cascade_classifier PROPERTIES OUTPUT_NAME cascade_classifier PREFIX "")
-set_target_properties(${PROJECT_NAME}_training_image_capture PROPERTIES OUTPUT_NAME training_image_capture PREFIX "")
-set_target_properties(${PROJECT_NAME}_opencv_viewer PROPERTIES OUTPUT_NAME opencv_viewer PREFIX "")
-
-
+# set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(${PROJECT_NAME}_ball_tracking ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(${PROJECT_NAME}_ball_tracking_eq ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(${PROJECT_NAME}_background_removal ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(${PROJECT_NAME}_cascade_classifier ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(${PROJECT_NAME}_training_image_capture ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(${PROJECT_NAME}_opencv_viewer ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-
+# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME}_ball_tracking
-  ${catkin_LIBRARIES}
-	${OpenCV_LIBRARIES}
-)
-
-target_link_libraries(${PROJECT_NAME}_ball_tracking_eq
-  ${catkin_LIBRARIES}
-	${OpenCV_LIBRARIES}
-)
-
-target_link_libraries(${PROJECT_NAME}_background_removal
-  ${catkin_LIBRARIES}
-	${OpenCV_LIBRARIES}
-)
-
-target_link_libraries(${PROJECT_NAME}_cascade_classifier
-  ${catkin_LIBRARIES}
-	${OpenCV_LIBRARIES}
-)
-
-target_link_libraries(${PROJECT_NAME}_training_image_capture
-  ${catkin_LIBRARIES}
-	${OpenCV_LIBRARIES}
-)
-
-target_link_libraries(${PROJECT_NAME}_opencv_viewer
-  ${catkin_LIBRARIES}
-	${OpenCV_LIBRARIES}
-)
-
+# target_link_libraries(${PROJECT_NAME}_node
+#   ${catkin_LIBRARIES}
+# )
 
 #############
 ## Install ##
@@ -224,9 +164,9 @@ target_link_libraries(${PROJECT_NAME}_opencv_viewer
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-install(TARGETS ${PROJECT_NAME}_ball_tracking ${PROJECT_NAME}_ball_tracking_eq ${PROJECT_NAME}_background_removal ${PROJECT_NAME}_cascade_classifier ${PROJECT_NAME}_training_image_capture ${PROJECT_NAME}_opencv_viewer
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+# install(TARGETS ${PROJECT_NAME}_node
+#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
 
 ## Mark libraries for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
@@ -244,14 +184,18 @@ install(TARGETS ${PROJECT_NAME}_ball_tracking ${PROJECT_NAME}_ball_tracking_eq $
 # )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-install(DIRECTORY cascade_data/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/cascade_data)
+# install(FILES
+#   # myfile1
+#   # myfile2
+#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+# )
 
 #############
 ## Testing ##
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_table_vision_sensing.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_table_gameplay_ai.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

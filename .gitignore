@@ -1,2 +1,8 @@
 ocam/
 .rosinstall.bak
+table_vision_sensing/HAAR_500pos_500neg_defaulteverything/
+table_vision_sensing/HAAR_700pos_500neg_01FAR/
+table_vision_sensing/HAAR_700pos_500neg_01FAR_999MHR/
+table_vision_sensing/LBP_700pos_500neg_01FAR_999MHR/
+table_vision_sensing/cascade_data/stage*
+table_vision_sensing/training_data/

@@ -1,6 +1,12 @@
 <launch>
+  <arg name="view_image" default="False" doc="Set to True to show the image from the camera on launch."/>
+
   <include file="$(find ocam)/launch/ocam_ros.launch">
-    <arg name="show_image" value="false"/>
+    <arg name="show_image" value="false"/> <!-- Show the raw, uncalibrated image -->
   </include>
+
   <node ns="camera" name="image_proc" pkg="image_proc" type="image_proc"/>
+
+  <node name="opencv_viewer" type="opencv_viewer" pkg="table_vision_sensing" output="screen"/>
+
 </launch>

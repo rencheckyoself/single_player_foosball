@@ -5,3 +5,11 @@ fwd_rot:
 fwd_lin:
   serial_number: "00306480" # tic controller serial number - obtained through ticgui or ticcli command
   nickname: "fwd_lin"
+
+def_rot:
+  serial_number: "00306442"
+  nickname: "def_rot"
+
+def_lin:
+  serial_number: "00306441"
+  nickname: "def_lin"

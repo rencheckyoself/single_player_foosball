@@ -1,6 +1,10 @@
 <launch>
 
-  <include file="$(find table_vision_sensing)/launch/start_ocam.launch"/>
+  <arg name="view_image" default="False" doc="Set to True to show the image from the camera on launch."/>
+
+  <include file="$(find table_vision_sensing)/launch/start_ocam.launch">
+    <arg name="view_image" value="$(arg view_image)"/>
+  </include>
 
   <!-- <node name="background_removal" type="background_removal" pkg="table_vision_sensing" output="screen">
     <remap from="/image_converter/fg_mask" to="/camera/fg_mask"/>
