@@ -44,8 +44,6 @@ namespace tracking
                             0, 0, 1);
 
     std::vector<double> rvec;
-    t_w.create(3, 1, cv::DataType<double>::type);
-    // std::vector<double> tvec;
 
     // Get R and t to convert to the world frame
     // using rectified image, so do not need distortion params
@@ -57,10 +55,10 @@ namespace tracking
     ROS_INFO_STREAM("Translation: " << t_w);
 
     intrinsic_inv = intrinsic.inv();
-    R_w_T = R_w.clone().t();
+    R_w_T = R_w.t();
 
-    left = intrinsic_inv * R_w_T;
-    right = R_w_T * t_w;
+    AR_T = intrinsic_inv * R_w_T;
+    M2 = R_w_T * t_w;
 
     ball_pos_sub = n.subscribe("BallPosition", 1, &BallTracker::storeBallPos, this);
   }
@@ -72,11 +70,23 @@ namespace tracking
 
   cv::Point3d BallTracker::getWorldPosition()
   {
+    cv::Matx31d uv = ball_img_pos;
     cv::Point3d xyz;
 
-    double s = s();
+    cv::Matx31d M1 = AR_T * uv;
+
+    double s = calc_s(M1);
+
+    xyz.x = M1(0,0) * s - M2(0,0);
+    xyz.y = M1(1,0) * s - M2(1,0);
+    xyz.z = zw;
 
     return xyz;
+  }
+
+  double BallTracker::calc_s(cv::Matx31d left)
+  {
+    return (zw + M2(2,0))/left(2,0);
   }
 
   std::vector<std::vector<double>> parse_points_data(XmlRpc::XmlRpcValue point_data)
