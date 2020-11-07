@@ -8,11 +8,7 @@
 /// SERIVCES:
 
 #include <ros/ros.h>
-
 #include <iostream>
-#include <tic.hpp>
-
-#include "tic_server.hpp"
 
 /// \brief main function to create the real_waypoints node
 int main(int argc, char** argv)

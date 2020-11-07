@@ -2,7 +2,6 @@
 
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
-#include <image_geometry/pinhole_camera_model.h>
 
 #include <sensor_msgs/image_encodings.h>
 #include <geometry_msgs/Point.h>
@@ -21,8 +20,6 @@ class ImageConverter
 
   ros::Publisher ball_pos;
 
-  image_geometry::PinholeCameraModel cam_model_;
-
   cv::CascadeClassifier ball_finder;
 
   ros::Time last_frame;
@@ -36,7 +33,7 @@ public:
     // Subscrive to input video feed and publish output video feed
     image_sub_ = it_.subscribe("/camera/image_rect_color", 1, &ImageConverter::imageCb, this);
 
-    ball_pos = n.advertise<geometry_msgs::Point>("BallPostion", 1);
+    ball_pos = n.advertise<geometry_msgs::Point>("BallPosition", 1);
 
     // Load the trained model
     if(!ball_finder.load("/home/michaelrencheck/FinalProject/src/table_vision_sensing/cascade_data/cascade.xml"))

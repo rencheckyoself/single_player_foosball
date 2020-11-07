@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(table_vision_sensing)
 
-## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-Wall -Wextra -Wno-psabi)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(table_gameplay_ai)
 
-## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+add_compile_options(-Wall -Wextra -Wno-psabi)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -10,6 +12,9 @@ project(table_gameplay_ai)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
 )
+
+find_package(OpenCV)
+
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -101,9 +106,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES table_gameplay_ai
-#  CATKIN_DEPENDS roscpp
+ INCLUDE_DIRS include
+ LIBRARIES ${PROJECT_NAME}
+ CATKIN_DEPENDS roscpp
 #  DEPENDS system_lib
 )
 
@@ -114,19 +119,19 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+	include/${PROJECT_NAME}
   ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/table_gameplay_ai.cpp
-# )
+add_library(${PROJECT_NAME}
+  src/${PROJECT_NAME}/ball_prediction.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context

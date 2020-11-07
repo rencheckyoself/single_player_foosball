@@ -7,6 +7,8 @@
 
   <node ns="camera" name="image_proc" pkg="image_proc" type="image_proc"/>
 
-  <node name="opencv_viewer" type="opencv_viewer" pkg="table_vision_sensing" output="screen"/>
+  <node if="$(arg view_image)" name="opencv_viewer" type="opencv_viewer" pkg="table_vision_sensing" output="screen">
+    <param name="point_radius" value="7"/>
+  </node>
 
 </launch>
