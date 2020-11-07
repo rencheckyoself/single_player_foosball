@@ -8,26 +8,30 @@
 /// SERIVCES:
 
 #include <ros/ros.h>
-#include <iostream>
+
+#include "ball_prediction.hpp"
 
 /// \brief main function to create the real_waypoints node
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "follow_ball");
-  ros::NodeHandle np("~");
-  ros::NodeHandle n;
 
-  // Get the position of the ball
+  tracking::BallTracker foosball(0);
 
-  // identify the third of the field the ball is in
+  ros::Rate r(100);
 
-  // convert ball pixel position to stepper position
+  while(ros::ok())
+  {
+    // Get the position of the ball
+    cv::Point3d pos = foosball.getWorldPosition();
 
-  // send linear stepper command
+    ROS_INFO_STREAM("Ball Position: " << pos);
 
+    ros::spinOnce();
 
+    r.sleep();
+  }
 
-  ros::spin();
 
   return 0;
 }

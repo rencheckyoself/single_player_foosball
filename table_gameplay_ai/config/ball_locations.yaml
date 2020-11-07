@@ -1,11 +1,14 @@
 # Field Corner locations
 # Make sure world coordinates are in meters if you used ros image pipeline to calibrate your camera, otherwise use the same units as your calibration method
-world_coordinates: [[0,      0,      0],
-                    [0.3894, 0,      0],
-                    [0.3894, 0.2714, 0],
-                    [0,      0.2714, 0]]
+world_coordinates: [[0.0, 0.0, 0.0],
+                    # [0.3894, 0.0, 0.0],
+                    [389.4, 0.0, 0.0],
+                    # [0.3894, 0.2714, 0.0],
+                    [389.4, 271.4, 0.0],
+                    # [0.0, 0.2714, 0.0]]
+                    [0.0, 271.4, 0.0]]
 
-image_coordinates: [[94,  415],
-                    [550, 407],
-                    [554, 60 ],
-                    [86,  63 ]]
+image_coordinates: [[94.,  415.],
+                    [550., 407.],
+                    [554., 60.],
+                    [86.,  63.]]

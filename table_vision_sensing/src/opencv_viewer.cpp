@@ -80,7 +80,7 @@ public:
     last_frame_time = msg->header.stamp;
 
     cv::circle(cv_ptr->image, ball_loc, 5, cv::Scalar(0,0,255), -1);
-    ROS_INFO_STREAM("Ball Coordinates: " << ball_loc.x << ", " << ball_loc.y);
+    // ROS_INFO_STREAM("Ball Coordinates: " << ball_loc.x << ", " << ball_loc.y);
 
     cv::Point origin = cam_model_.project3dToPixel(cv::Point3d(0, 0, 100));
 

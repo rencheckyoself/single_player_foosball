@@ -24,11 +24,11 @@ namespace tracking
   public:
 
     /// \brief default contrsuctor
-    BallTracker();
+    BallTracker() {};
 
     /// \brief provide the known z height to assume the ball is always at
     /// \param z the z coordinate of the ball in the world frame
-    BallTracker(double z) : zw(z) {};
+    BallTracker(double z);
 
     /// \brief Convert the balls image position to real world coordinates
     /// \returns the xyz postion of the ball relative to the world frame defined by the points in ball_locations.yaml

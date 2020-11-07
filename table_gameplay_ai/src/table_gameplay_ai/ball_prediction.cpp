@@ -4,7 +4,7 @@
 namespace tracking
 {
 
-  BallTracker::BallTracker()
+  BallTracker::BallTracker(double z) : zw(z)
   {
 
     ros::NodeHandle n;
@@ -43,11 +43,13 @@ namespace tracking
                             0, camera_matrix.at(4), camera_matrix.at(5),
                             0, 0, 1);
 
+    ROS_INFO_STREAM("Intrinsic: " << intrinsic);
+
     std::vector<double> rvec;
 
     // Get R and t to convert to the world frame
     // using rectified image, so do not need distortion params
-    cv::solvePnP(world_points, image_points, intrinsic, 0, rvec, t_w);
+    cv::solvePnP(world_points, image_points, intrinsic, cv::Mat(), rvec, t_w);
 
     cv::Rodrigues(rvec, R_w);
 
@@ -95,11 +97,11 @@ namespace tracking
 
     for(int i = 0; i < point_data.size(); i++)
     {
-      auto point = point_data[i];
       std::vector<double> p;
-      for(int j = 0; j < point.size(); j++)
+
+      for(int j = 0; j < point_data[i].size(); j++)
       {
-        p.push_back(point[j]);
+        p.push_back(double(point_data[i][j]));
       }
       output.push_back(p);
     }
