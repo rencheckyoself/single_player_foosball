@@ -34,16 +34,30 @@ namespace tracking
     /// \returns the xyz postion of the ball relative to the world frame defined by the points in ball_locations.yaml
     cv::Point3d getWorldPosition();
 
+    /// \brief Convert the balls image position to real world coordinates
+    /// \param uv the pixel coordinates to convert
+    /// \returns the xyz postion of the ball relative to the world frame defined by the points in ball_locations.yaml
+    cv::Point3d getWorldPosition(cv::Point2d uv);
+
+    /// \brief Use the known coordinate pairs to test the output the the PnP estimate of the world frame transform
+    /// \returns true if the estimated transform results in pixel positions less than a certain threshold
+    bool testExtrinsicResults();
+
   private:
+
+    /// \brief Convert the balls image position to real world coordinates
+    /// \param pixel_coords the pixel coordinates to convert
+    /// \returns the xyz postion corresponding to the image coordinate provided
+    cv::Point3d toWorldConversion(cv::Matx31d uv);
 
     /// \brief callback function to store the most up to date image location of the ball
     /// \param msg the ball image coordinates
     void storeBallPos(geometry_msgs::Point msg);
 
     /// \brief calculate s in the pinhole model
-    /// \param left A*R^T*{u;v;1}
+    /// \param M1 A*R^T*{u;v;1}
     /// \returns the scaling parameter s
-    double calc_s(cv::Matx31d left);
+    double calc_s(cv::Matx31d M1);
 
     ros::Subscriber ball_pos_sub; ///< subscriber for the ball position
 

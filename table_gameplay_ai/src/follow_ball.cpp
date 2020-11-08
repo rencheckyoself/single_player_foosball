@@ -20,12 +20,16 @@ int main(int argc, char** argv)
 
   ros::Rate r(100);
 
+  foosball.testExtrinsicResults();
+
+  // ros::spin();
+
   while(ros::ok())
   {
     // Get the position of the ball
     cv::Point3d pos = foosball.getWorldPosition();
 
-    ROS_INFO_STREAM("Ball Position: " << pos);
+    // ROS_INFO_STREAM("Ball Position: " << pos);
 
     ros::spinOnce();
 
