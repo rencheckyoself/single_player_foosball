@@ -26,6 +26,8 @@
   <xacro:property name="attack_rod_distance" value="${props['attack_rod_distance']}"/>
   <xacro:property name="goalie_rod_distance" value="${props['goalie_rod_distance']}"/>
 
+  <xacro:property name="rod_travel_distance" value="${props['rod_travel_distance']}"/>
+
   <xacro:property name="wall_thickness" value="0.015"/>
 
   <!-- Macro to create a player -->
@@ -88,7 +90,7 @@
       <parent link="${name}_mount_p"/>
       <child link="${name}_rod"/>
       <axis xyz="0 1 0"/>
-      <limit upper="0.05" lower="-0.05" effort="10" velocity="2"/>
+      <limit upper="${rod_travel_distance/2}" lower="${-rod_travel_distance/2}" effort="10" velocity="2"/>
     </joint>
 
     <!-- attach players to each rod -->

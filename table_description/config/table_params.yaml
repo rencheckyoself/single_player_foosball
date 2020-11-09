@@ -17,11 +17,13 @@ player_moutningheight: 0.042 # height of the mounting axis of the player to the 
 ball_diameter: 0.0274 # ball diameter
 
 field_length: 0.402 # field length from goal to goal
-field_width: 0.285 # field width from side to side
+field_width: 0.280 # field width from side to side
 
 wall_height: 0.062 # height of the side walls
 
 goal_height: 0.040 # height of the goal opening
 goal_width: 0.080 # width of the goal opening
+
+rod_travel_distance: 0.090 # distance of the rod travel
 
 # Interial Parameters

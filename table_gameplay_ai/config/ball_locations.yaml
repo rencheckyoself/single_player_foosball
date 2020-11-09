@@ -3,9 +3,10 @@
 world_coordinates: [[0.0, 0.0, 0.0],
                     [0.3894, 0.0, 0.0],
                     [0.3894, 0.2714, 0.0],
-                    # [0.0, 0.2714, 0.0],
+                    [0.0, 0.2714, 0.0]]
                     # [0.201, 0.0, 0.0],
-                    [0.201, 0.2714, 0.0]]
+                    # [0.201, 0.2714, 0.0]]
+
                     # white side, defensive corner
                     # white side, offensive corner
                     # grey side defensive corner
@@ -13,11 +14,11 @@ world_coordinates: [[0.0, 0.0, 0.0],
                     # white side midfield
                     # grey side midfield
 
-image_coordinates: [[94.,  415.],
-                    [550., 407.],
-                    [554., 60.],
-                    # [86.,  63.],
+image_coordinates: [[86.,  415.],
+                    [554., 415.],
+                    [554., 63.],
+                    [86.,  63.]]
                     # [322., 410.],
-                    [322., 63.]]
+                    # [322., 63.]]
 
-translation_est: [0.145, 0.2, 0.310]
+# translation_est: [-0.145, -0.2, 0.310]

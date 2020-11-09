@@ -45,34 +45,53 @@ namespace tracking
                             0, camera_matrix.at(4), camera_matrix.at(5),
                             0, 0, 1);
 
-    ROS_INFO_STREAM("Intrinsic: \n" << intrinsic);
-
+    // ROS_INFO_STREAM("Intrinsic: \n" << intrinsic);
 
     std::vector<double> rvec;
-
-    // Get R and t to convert to the world frame
-    // using rectified image, so do not need distortion params
-    cv::solvePnP(world_points, image_points, intrinsic, cv::Mat(), rvec, t_w, false, cv::SOLVEPNP_P3P);
-
-    cv::Rodrigues(rvec, R_w);
-
+    // cv::Mat rvec;
+    // cv::Mat R_guess = cv::Mat::zeros(3, 3, CV_64FC1);;
+    // R_guess.at<double>(0,0) = 1;
+    // R_guess.at<double>(1,1) = 1;
+    // R_guess.at<double>(2,2) = -1;
+    // //
+    // cv::Rodrigues(R_guess, rvec);
+    //
     // t_w(0,0) = translation_est.at(0);
     // t_w(1,0) = translation_est.at(1);
     // t_w(2,0) = translation_est.at(2);
+    //
+    // ROS_INFO_STREAM("GUESSES: \n");
+    // ROS_INFO_STREAM("Rotation: \n" << rvec);
+    // ROS_INFO_STREAM("Translation: \n" << t_w);
 
+
+    // Get R and t to convert to the world frame
+    // using rectified image, so do not need distortion params
+    cv::solvePnP(world_points, image_points, intrinsic, cv::Mat(), rvec, t_w, true, cv::SOLVEPNP_P3P);
+
+    // int iterations = 1000;
+    // float reprojectionError = 0.001;
+    // double confidence = 0.99;
+    // cv::solvePnPRansac(world_points, image_points, intrinsic, cv::noArray(), rvec, t_w, false, iterations, reprojectionError, confidence, cv::noArray());
+
+    cv::Rodrigues(rvec, R_w);
+
+    R_w(2,2) = 1;
+
+    ROS_INFO_STREAM("WORLD RELATIVE TO THE CAMERA:\n");
     ROS_INFO_STREAM("Rotation: \n" << R_w);
     ROS_INFO_STREAM("Translation: \n" << t_w);
 
     intrinsic_inv = intrinsic.inv();
 
-    ROS_INFO_STREAM("Intrinsic Inv: \n" << intrinsic_inv);
+    // ROS_INFO_STREAM("Intrinsic Inv: \n" << intrinsic_inv);
 
     R_w_T = R_w.t();
 
     AR_T = intrinsic_inv * R_w_T;
     M2 = R_w_T * t_w;
 
-    ROS_INFO_STREAM("M2: \n" << M2);
+    // ROS_INFO_STREAM("M2: \n" << M2);
 
     ball_pos_sub = n.subscribe("BallPosition", 1, &BallTracker::storeBallPos, this);
   }
@@ -122,6 +141,7 @@ namespace tracking
 
     xyz.x = M1(0,0) * s - M2(0,0);
     xyz.y = M1(1,0) * s - M2(1,0);
+    xyz.y *= -1; // Hack to fix SolvePnP
     xyz.z = zw;
 
     return xyz;
