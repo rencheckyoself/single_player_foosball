@@ -9,6 +9,8 @@
     <rosparam command="load" file="$(find ocam)/config/camera.yaml"/>
   </node>
 
-
+  <include file="$(find table_description)/launch/view_table.launch">
+    <arg name="use_gui" value="False"/>
+  </include>
 
 </launch>

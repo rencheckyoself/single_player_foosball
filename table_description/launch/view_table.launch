@@ -1,15 +1,16 @@
 <launch>
   <!-- This launch file is used to display the table urdf -->
 
-  <!-- load the urdf with xacro file-->
-  <param name="robot_description" command="xacro '$(find table_description)/urdf/table.urdf.xacro'" />
-  
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
-
+  <arg name="use_gui" default="true" doc="Use the joint state publisher gui if true."/>
   <arg name="rviz_config" value="-d $(find table_description)/config/display.rviz" doc="The file path for the rviz config"/>
 
+  <!-- load the urdf with xacro file-->
+  <param name="robot_description" command="xacro '$(find table_description)/urdf/table.urdf.xacro'" />
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
   <!-- The joint state publisher will be launched with a gui -->
-  <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui"/>
+  <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" if="$(arg use_gui)"/>
 
   <!-- Launch rviz as a required node -->
   <node name="rviz" pkg="rviz" type="rviz" args="$(arg rviz_config)" required="true"/>

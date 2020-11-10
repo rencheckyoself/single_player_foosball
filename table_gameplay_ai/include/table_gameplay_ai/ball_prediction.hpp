@@ -3,6 +3,9 @@
 #ifndef TRACKING_INCLUDE_GUARD_HPP
 #define TRACKING_INCLUDE_GUARD_HPP
 
+// #include <iostream>
+#include <utility>
+
 #include <ros/ros.h>
 
 #include <geometry_msgs/Point.h>
@@ -13,7 +16,6 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 
-#include <iostream>
 
 namespace tracking
 {
@@ -43,6 +45,14 @@ namespace tracking
     /// \returns true if the estimated transform results in pixel positions less than a certain threshold
     bool testExtrinsicResults();
 
+    /// \brief Get the range of possible x coordinates based on the ball locations provided
+    /// \returns the min/max values for the range of x coordinates where first is the minimum and second is the maximum
+    std::pair<double,double> getXRange();
+
+    /// \brief Get the range of possible y coordinates based on the ball locations provided
+    /// \returns the min/max values for the range of y coordinates where first is the minimum and second is the maximum
+    std::pair<double,double> getYRange();
+
   private:
 
     /// \brief Convert the balls image position to real world coordinates
@@ -58,6 +68,9 @@ namespace tracking
     /// \param M1 A*R^T*{u;v;1}
     /// \returns the scaling parameter s
     double calc_s(cv::Matx31d M1);
+
+    std::pair<double,double> xrange;
+    std::pair<double,double> yrange;
 
     ros::Subscriber ball_pos_sub; ///< subscriber for the ball position
 

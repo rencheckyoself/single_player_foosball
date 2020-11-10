@@ -136,6 +136,12 @@ include_directories(
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
   src/${PROJECT_NAME}/tic_server.cpp
+	src/${PROJECT_NAME}/location_conversion.cpp
+)
+
+target_link_libraries(${PROJECT_NAME}
+	${catkin_LIBRARIES}
+	${ticAPI_LIBRARIES}
 )
 
 ## Add cmake target dependencies of the library

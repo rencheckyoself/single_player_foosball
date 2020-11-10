@@ -24,6 +24,18 @@ namespace tracking
     std::vector<std::vector<double>> wc = parse_points_data(world_coordinates);
     std::vector<std::vector<double>> ic = parse_points_data(image_coordinates);
 
+    xrange = std::make_pair(1000.0, -1000.0);
+    yrange = std::make_pair(1000.0, -1000.0);
+
+    for(const auto pt : wc)
+    {
+      if(xrange.first > pt.at(0)) xrange.first = pt.at(0);
+      else if(xrange.second < pt.at(0)) xrange.second = pt.at(0);
+
+      if(yrange.first > pt.at(1)) yrange.first = pt.at(1);
+      else if(yrange.second < pt.at(1)) yrange.second = pt.at(1);
+    }
+
     // Convert reference points to opencv data types
     for( const auto pt : wc)
     {
@@ -131,6 +143,16 @@ namespace tracking
     return toWorldConversion(ball_img_pos);
   }
 
+  std::pair<double,double> BallTracker::getXRange()
+  {
+    return xrange;
+  }
+
+  std::pair<double,double> BallTracker::getYRange()
+  {
+    return yrange;
+  }
+
   cv::Point3d BallTracker::toWorldConversion(cv::Matx31d uv)
   {
     cv::Point3d xyz;
@@ -141,7 +163,7 @@ namespace tracking
 
     xyz.x = M1(0,0) * s - M2(0,0);
     xyz.y = M1(1,0) * s - M2(1,0);
-    xyz.y *= -1; // Hack to fix SolvePnP
+    xyz.y *= -0.95; // Hack to fix SolvePnP
     xyz.z = zw;
 
     return xyz;

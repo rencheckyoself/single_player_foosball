@@ -73,19 +73,19 @@
       </visual>
     </link>
 
-    <joint name="${name}_mount_joint_c" type="fixed">
+    <joint name="${name}_fixed_joint" type="fixed">
       <origin xyz="${dir*dist} ${-field_width/2} ${rod_mountingheight}"/>
       <parent link="field"/>
       <child link="${name}_mount_c"/>
     </joint>
 
-    <joint name="${name}_mount_joint_p" type="continuous">
+    <joint name="${name}_rot_joint" type="continuous">
       <parent link="${name}_mount_c"/>
       <child link="${name}_mount_p"/>
       <axis xyz="0 1 0"/>
     </joint>
 
-    <joint name="${name}_rod_joint_p" type="prismatic">
+    <joint name="${name}_lin_joint" type="prismatic">
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <parent link="${name}_mount_p"/>
       <child link="${name}_rod"/>

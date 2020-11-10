@@ -7,16 +7,15 @@
 ///
 /// SERIVCES:
 
+#include <utility>
+
 #include <ros/ros.h>
 
-#include "ball_prediction.hpp"
-#include "tic_server.hpp"
+#include <sensor_msgs/JointState.h>
 
-double map_ranges(double input, double from_min, double from_max, double to_min, double to_max)
-{
-  double ratio = (to_max - to_min) / (from_max - from_min);
-  return to_min + ratio * (input - from_min);
-}
+#include "ball_prediction.hpp"
+#include "table_motor_control/tic_server.hpp"
+#include "table_motor_control/location_conversion.hpp"
 
 /// \brief main function to create the real_waypoints node
 int main(int argc, char** argv)
@@ -25,6 +24,8 @@ int main(int argc, char** argv)
 
   ros::NodeHandle np("~");
   ros::NodeHandle n;
+
+  ros::Publisher joint_pub = n.advertise<sensor_msgs::JointState>("joint_states", 1);
 
   std::string def_rot_sn, def_lin_sn;
   std::string def_rot_nickname, def_lin_nickname;
@@ -41,8 +42,8 @@ int main(int argc, char** argv)
   ROS_INFO_STREAM("TICCMD: Defensive Rotation Name: " << def_rot_nickname);
   ROS_INFO_STREAM("TICCMD: Defensive Linear Name: " << def_lin_nickname);
 
-  tic_server::TicCtrlr def_rot(def_rot_sn, def_rot_nickname);
-  tic_server::TicCtrlr def_lin(def_lin_sn, def_lin_nickname);
+  // tic_server::TicCtrlr def_rot(def_rot_sn, def_rot_nickname);
+  // tic_server::TicCtrlr def_lin(def_lin_sn, def_lin_nickname);
 
   tracking::BallTracker foosball(0);
 
@@ -50,14 +51,31 @@ int main(int argc, char** argv)
 
   foosball.testExtrinsicResults();
 
+  sensor_msgs::JointState joint_msg;
+
+  std::vector<std::string> joint_names = {"white_attack_rot_joint", "white_attack_lin_joint", "white_goalie_rot_joint", "white_goalie_lin_joint", "grey_attack_rot_joint", "grey_attack_lin_joint", "grey_goalie_rot_joint", "grey_goalie_lin_joint"};
+  joint_msg.name = joint_names;
+
+  // std::pair<double,double> xrange = foosball.getXRange();
+  std::pair<double,double> yrange = foosball.getYRange();
+
   while(ros::ok())
   {
+    std::vector<double> joint_vals(joint_names.size(), 0);
+
     // Get the position of the ball
     cv::Point3d pos = foosball.getWorldPosition();
 
     ROS_INFO_STREAM("Ball Position: " << pos);
 
+    double def_lin_pos = location_conversion::getLinearPosition(pos.y, yrange, std::make_pair<double,double>(-0.045, 0.045));
 
+    joint_vals.at(3) = def_lin_pos;
+
+    joint_msg.header.stamp = ros::Time::now();
+    joint_msg.position = joint_vals;
+
+    joint_pub.publish(joint_msg);
 
     ros::spinOnce();
 

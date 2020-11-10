@@ -6,11 +6,16 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Get tic libraries
+set(ticAPI_INCLUDE_DIRS /usr/local/include/libpololu-tic-1)
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  sensor_msgs
+	table_motor_control
 )
 
 find_package(OpenCV)
@@ -108,7 +113,7 @@ find_package(OpenCV)
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES ${PROJECT_NAME}
- CATKIN_DEPENDS roscpp
+ CATKIN_DEPENDS roscpp sensor_msgs
 #  DEPENDS system_lib
 )
 
@@ -122,6 +127,7 @@ include_directories(
 	include/${PROJECT_NAME}
   ${catkin_INCLUDE_DIRS}
 	${OpenCV_INCLUDE_DIRS}
+	${ticAPI_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -152,8 +158,9 @@ add_dependencies(${PROJECT_NAME}_follow_ball ${${PROJECT_NAME}_EXPORTED_TARGETS}
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_follow_ball
   ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
 	${PROJECT_NAME}
-	${OpenCV_LIBRARIES}
+  ${table_motor_control_LIBRARIES}
 )
 
 #############

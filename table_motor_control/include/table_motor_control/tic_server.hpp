@@ -8,8 +8,8 @@
 
 #include <stdint.h>
 #include <iostream>
-#include <tic.hpp>
 
+#include "tic.hpp"
 #include "table_motor_control/Int32.h"
 
 namespace tic_server
