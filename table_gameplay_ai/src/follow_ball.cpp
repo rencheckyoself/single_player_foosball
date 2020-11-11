@@ -66,11 +66,13 @@ int main(int argc, char** argv)
     // Get the position of the ball
     cv::Point3d pos = foosball.getWorldPosition();
 
-    ROS_INFO_STREAM("Ball Position: " << pos);
+    // ROS_INFO_STREAM(pos);
 
     double def_lin_pos = location_conversion::getLinearPosition(pos.y, yrange, std::make_pair<double,double>(-0.045, 0.045));
+    double def_rot_pos = location_conversion::getAngularPosition(pos.x, 0.085, 0.010);
 
     joint_vals.at(3) = def_lin_pos;
+    joint_vals.at(2) = def_rot_pos;
 
     joint_msg.header.stamp = ros::Time::now();
     joint_msg.position = joint_vals;

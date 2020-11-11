@@ -4,6 +4,8 @@
 #define LOC_CONV_INCLUDE_GUARD_HPP
 
 #include <utility>
+#include <algorithm>
+#include <cmath>
 
 namespace location_conversion
 {
@@ -25,6 +27,16 @@ namespace location_conversion
   /// \TODO: add bounds checking on the input value
   double map_ranges(double input, double from_min, double from_max, double to_min, double to_max);
 
+  /// \brief Use the x coordinate of the ball to determine the angular position of the rod
+  /// \param pos the x coordinate of the ball
+  /// \param thresh the threshold to send a kick command
+  /// \param rod_x_coord the x coordinate for the ball needs to be at to optimally kick the ball
+  /// \returns an anlge in radians to move the rod to
+  /// \TODO: Account for ball velocity or recalculate thresh to account for the veloctiy
+  double getAngularPosition(double pos, double thresh, double rod_x_coord);
+
+  /// \brief reads in the joint state message and converts it to the proper stepper command
+  void jointMsg_to_Steppers();
 
 }
 #endif

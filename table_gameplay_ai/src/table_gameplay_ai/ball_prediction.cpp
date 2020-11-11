@@ -76,7 +76,6 @@ namespace tracking
     // ROS_INFO_STREAM("Rotation: \n" << rvec);
     // ROS_INFO_STREAM("Translation: \n" << t_w);
 
-
     // Get R and t to convert to the world frame
     // using rectified image, so do not need distortion params
     cv::solvePnP(world_points, image_points, intrinsic, cv::Mat(), rvec, t_w, true, cv::SOLVEPNP_P3P);
@@ -126,7 +125,8 @@ namespace tracking
 
   void BallTracker::storeBallPos(geometry_msgs::Point msg)
   {
-    ball_img_pos = cv::Matx31d(msg.x, msg.y, 1);
+    // Only update the postion if an object has been detected.
+    if(msg.x != 0 && msg.y !=0) ball_img_pos = cv::Matx31d(msg.x, msg.y, 1);
   }
 
   cv::Point3d BallTracker::getWorldPosition(cv::Point2d uv)
@@ -163,7 +163,7 @@ namespace tracking
 
     xyz.x = M1(0,0) * s - M2(0,0);
     xyz.y = M1(1,0) * s - M2(1,0);
-    xyz.y *= -0.95; // Hack to fix SolvePnP
+    xyz.y *= -1; // Hack to fix SolvePnP
     xyz.z = zw;
 
     return xyz;
