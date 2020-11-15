@@ -1,13 +1,13 @@
 fwd_rot:
   serial_number: "00306462" # tic controller serial number - obtained through ticgui or ticcli command
-  nickname: "fwd_rot" # nickname used differentiate services 
+  nickname: "fwd_rot" # nickname used differentiate services
 
 fwd_lin:
   serial_number: "00306480"
   nickname: "fwd_lin"
 
 def_rot:
-  serial_number: "00306442"
+  serial_number: "00306443"
   nickname: "def_rot"
 
 def_lin:

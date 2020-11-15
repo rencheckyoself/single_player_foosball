@@ -84,12 +84,7 @@ namespace tic_server
 
   private:
 
-    /// \brief Opens a handle to a Tic that can be used for communication. Code pulled from Tic User Manual.
-    ///
-    /// To open a handle to any Tic:
-    ///   tic_handle * handle = open_handle();
-    /// To open a handle to the Tic with serial number 01234567:
-    ///   tic_handle * handle = open_handle("01234567");
+    /// \brief Opens a handle to a Tic that can be used for communication. Code copied from Tic User Manual.
     /// \param desired_serial_number serial number of TIC board
     /// returns the handle to the tic board
     tic::handle open_handle(std::string desired_serial_number);
@@ -106,4 +101,4 @@ namespace tic_server
   };
 }
 
-#endif //PFIELD_INCLUDE_GUARD_HPP
+#endif //TIC_SERVER_INCLUDE_GUARD_HPP

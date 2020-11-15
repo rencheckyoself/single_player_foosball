@@ -1,25 +1,88 @@
 # Field Corner locations
 # Make sure world coordinates are in meters if you used ros image pipeline to calibrate your camera, otherwise use the same units as your calibration method
 # Set the world frame such that the origin is in the bottom left corner of the automated side.
-world_coordinates: [[0.0, 0.0, 0.0],
-                    [0.3894, 0.0, 0.0],
-                    [0.3894, 0.2714, 0.0],
-                    [0.0, 0.2714, 0.0]]
-                    # [0.201, 0.0, 0.0],
-                    # [0.201, 0.2714, 0.0]]
+world_coordinates: [[0.0,     0.0,     0.0],
+                    [0.3745,  0.0,     0.0],
+                    [0.3745,  0.2565,  0.0],
+                    [0.0,     0.2565,  0.0],
+                    [0.18725, 0.12825, 0.0],
+                    [0.0,     0.12825, 0.0],
+                    [0.3745,  0.12825, 0.0],
+                    [0.11,    0.07534, 0.0],
+                    [0.2645,  0.07534, 0.0],
+                    [0.2645,  0.18116, 0.0],
+                    [0.11,    0.18116, 0.0],
 
-                    # white side, defensive corner
-                    # white side, offensive corner
-                    # grey side defensive corner
-                    # grey side offensive corner
-                    # white side midfield
-                    # grey side midfield
+                    [0.0,     0.0,     10.0],
+                    [0.3745,  0.0,     10.0],
+                    [0.3745,  0.2565,  10.0],
+                    [0.0,     0.2565,  10.0],
+                    [0.18725, 0.12825, 10.0],
+                    [0.0,     0.12825, 10.0],
+                    [0.3745,  0.12825, 10.0],
+                    [0.11,    0.07534, 10.0],
+                    [0.2645,  0.07534, 10.0],
+                    [0.2645,  0.18116, 10.0],
+                    [0.11,    0.18116, 10.0],
 
-image_coordinates: [[86.,  415.],
-                    [554., 415.],
-                    [554., 63.],
-                    [86.,  63.]]
-                    # [322., 410.],
-                    # [322., 63.]]
+                    [0.0,     0.0,     20.0],
+                    [0.3745,  0.0,     20.0],
+                    [0.3745,  0.2565,  20.0],
+                    [0.0,     0.2565,  20.0],
+                    [0.18725, 0.12825, 20.0],
+                    [0.0,     0.12825, 20.0],
+                    [0.3745,  0.12825, 20.0],
+                    [0.11,    0.07534, 20.0],
+                    [0.2645,  0.07534, 20.0],
+                    [0.2645,  0.18116, 20.0],
+                    [0.11,    0.18116, 20.0]]
 
-# translation_est: [-0.145, -0.2, 0.310]
+# Order of points in the list for a given height:
+# white side defensive corner
+# white side offensive corner
+# grey side defensive corner
+# grey side offensive corner
+# center
+# white goal center
+# grey goal center
+# white side defensive quardrant
+# white side offensive quardrant
+# grey side defensive quardrant
+# grey side offensive quardrant
+
+image_coordinates: [[97.,  412.],
+                    [549., 406.],
+                    [549., 66.],
+                    [90.,  67.],
+                    [323., 240.],
+                    [93.,  240.],
+                    [547., 237.],
+                    [231., 309.],
+                    [416., 308.],
+                    [416., 166.],
+                    [229., 169.],
+
+                    [90.,  416.],
+                    [557., 409.],
+                    [558., 60.],
+                    [83.,  62.],
+                    [320., 239.],
+                    [89.,  241.],
+                    [556., 237.],
+                    [556., 237.],
+                    [229., 312.],
+                    [417., 310.],
+                    [417., 167.],
+                    [226., 167.],
+
+                    [83.,  423.],
+                    [566., 417.],
+                    [564., 56.],
+                    [74.,  57.],
+                    [324., 239.],
+                    [79.,  242.],
+                    [564., 237.],
+                    [225., 314.],
+                    [421., 312.],
+                    [421., 164.],
+                    [223., 167.]]
