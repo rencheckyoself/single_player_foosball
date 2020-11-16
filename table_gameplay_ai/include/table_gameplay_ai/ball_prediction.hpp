@@ -36,18 +36,13 @@ namespace tracking
     /// \returns the xyz postion of the ball relative to the world frame defined by the points in ball_locations.yaml
     cv::Point3d getWorldPosition();
 
-    cv::Point3d getWorldPositionHomog();
-
-
     /// \brief Convert the balls image position to real world coordinates
     /// \param uv the pixel coordinates to convert
     /// \returns the xyz postion of the ball relative to the world frame defined by the points in ball_locations.yaml
     cv::Point3d getWorldPosition(cv::Point2d uv);
 
-    cv::Point3d getWorldPositionHomog(cv::Point2d uv);
-
     /// \brief Use the known coordinate pairs to test the output the the PnP estimate of the world frame transform
-    /// \returns true if the estimated transform results in pixel positions less than a certain threshold
+    /// \returns true if the estimated transform results in an error greater than error_threshold
     bool testExtrinsicResults();
 
     /// \brief Get the range of possible x coordinates based on the ball locations provided
@@ -60,31 +55,24 @@ namespace tracking
 
   private:
 
-    /// \brief Convert the balls image position to real world coordinates
+    /// \brief Convert the ball's image position to real world coordinates
     /// \param pixel_coords the pixel coordinates to convert
     /// \returns the xyz postion corresponding to the image coordinate provided
     cv::Point3d toWorldConversion(cv::Matx31d uv);
-
-    cv::Point3d toWorldConversionHomog(cv::Matx31d uv);
 
     /// \brief callback function to store the most up to date image location of the ball
     /// \param msg the ball image coordinates
     void storeBallPos(geometry_msgs::Point msg);
 
-    /// \brief calculate s in the pinhole model
-    /// \param M1 A*R^T*{u;v;1}
-    /// \returns the scaling parameter s
-    double calc_s(cv::Matx31d M1);
-
     /// \brief Calculate the extrinsic matrix using Homography
     void extrinsicByHomography();
 
     /// \brief Calculate the extrinsic matrix using SolvePNP
-    /// \TODO: Yields very poor estimate for some reason...
+    /// \TODO: Figure out why this yields very poor estimate for some reason...
     void extrinsicBySolvePNP();
 
-    std::pair<double,double> xrange;
-    std::pair<double,double> yrange;
+    std::pair<double,double> xrange; ///<range of possible x positions
+    std::pair<double,double> yrange; ///<rang of possoble y positions
 
     ros::Subscriber ball_pos_sub; ///< subscriber for the ball position
 
@@ -95,19 +83,10 @@ namespace tracking
     std::vector<cv::Point2d> image_points; ///< corresponding list of image coordinates
 
     double zw; ///< the known z coordinate for the ball, assuming it never leaves the field
-    cv::Matx33d R_w; ///< rotation matirix
-    cv::Matx31d t_w; ///< translation vector
+    double error_threshold; ///< error threshold for the extrinsic properties calculation
 
     cv::Mat H_mat; ///< Homography matrix
     cv::Matx33d H_inv; ///< Inverse Homography matrix
-
-    cv::Matx33d intrinsic; ///< intrinsic camera matrix
-
-    // Values to precompute for converting to world coordinates
-    cv::Matx33d intrinsic_inv; ///< inverse of the intrinsic camera matrix
-    cv::Matx33d R_w_T; ///< transposed rotation matirix
-    cv::Matx33d AR_T; ///< A^-1 * R^T
-    cv::Matx31d M2; ///< R^T * t
   };
 
   /// \brief helper funtion to parse through point data

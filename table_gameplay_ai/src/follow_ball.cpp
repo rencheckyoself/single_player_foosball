@@ -78,7 +78,7 @@ int main(int argc, char** argv)
     std::vector<double> joint_vals(joint_names.size(), 0);
 
     // Get the position of the ball
-    cv::Point3d pos = foosball.getWorldPositionHomog();
+    cv::Point3d pos = foosball.getWorldPosition();
 
     // ROS_INFO_STREAM(pos);
 

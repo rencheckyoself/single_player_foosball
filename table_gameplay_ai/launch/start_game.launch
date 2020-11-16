@@ -7,7 +7,6 @@
   <node name="follow_ball" type="follow_ball" pkg="table_gameplay_ai" output="screen">
     <rosparam command="load" file="$(find table_gameplay_ai)/config/ball_locations.yaml"/>
     <rosparam command="load" file="$(find table_motor_control)/config/motor_ids.yaml"/>
-    <rosparam command="load" file="$(find ocam)/config/camera.yaml"/>
   </node>
 
   <include file="$(find table_description)/launch/view_table.launch">
