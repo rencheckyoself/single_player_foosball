@@ -36,10 +36,15 @@ namespace tracking
     /// \returns the xyz postion of the ball relative to the world frame defined by the points in ball_locations.yaml
     cv::Point3d getWorldPosition();
 
+    cv::Point3d getWorldPositionHomog();
+
+
     /// \brief Convert the balls image position to real world coordinates
     /// \param uv the pixel coordinates to convert
     /// \returns the xyz postion of the ball relative to the world frame defined by the points in ball_locations.yaml
     cv::Point3d getWorldPosition(cv::Point2d uv);
+
+    cv::Point3d getWorldPositionHomog(cv::Point2d uv);
 
     /// \brief Use the known coordinate pairs to test the output the the PnP estimate of the world frame transform
     /// \returns true if the estimated transform results in pixel positions less than a certain threshold
@@ -60,6 +65,8 @@ namespace tracking
     /// \returns the xyz postion corresponding to the image coordinate provided
     cv::Point3d toWorldConversion(cv::Matx31d uv);
 
+    cv::Point3d toWorldConversionHomog(cv::Matx31d uv);
+
     /// \brief callback function to store the most up to date image location of the ball
     /// \param msg the ball image coordinates
     void storeBallPos(geometry_msgs::Point msg);
@@ -69,6 +76,13 @@ namespace tracking
     /// \returns the scaling parameter s
     double calc_s(cv::Matx31d M1);
 
+    /// \brief Calculate the extrinsic matrix using Homography
+    void extrinsicByHomography();
+
+    /// \brief Calculate the extrinsic matrix using SolvePNP
+    /// \TODO: Yields very poor estimate for some reason...
+    void extrinsicBySolvePNP();
+
     std::pair<double,double> xrange;
     std::pair<double,double> yrange;
 
@@ -76,12 +90,16 @@ namespace tracking
 
     cv::Matx31d ball_img_pos; ///< The current ball position in image coordinates
 
-    std::vector<cv::Point3d> world_points; ///< list of world points for known ball positions
+    std::vector<cv::Point3d> world_points3d; ///< list of world points for known ball positions
+    std::vector<cv::Point2d> world_points2d; ///< list of world points for known ball positions in the same plane
     std::vector<cv::Point2d> image_points; ///< corresponding list of image coordinates
 
     double zw; ///< the known z coordinate for the ball, assuming it never leaves the field
     cv::Matx33d R_w; ///< rotation matirix
     cv::Matx31d t_w; ///< translation vector
+
+    cv::Mat H_mat; ///< Homography matrix
+    cv::Matx33d H_inv; ///< Inverse Homography matrix
 
     cv::Matx33d intrinsic; ///< intrinsic camera matrix
 
