@@ -38,7 +38,7 @@ namespace tic_server
 
   void TicCtrlr::set_position(int32_t val)
   {
-    handle.halt_and_hold();
+    // handle.halt_and_hold();
     handle.set_target_position(val);
   }
 

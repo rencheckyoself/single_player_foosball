@@ -54,10 +54,10 @@ int main(int argc, char** argv)
 
   // tic_server::TicCtrlr def_rot(def_rot_sn, def_rot_nickname);
   // tic_server::TicCtrlr def_lin(def_lin_sn, def_lin_nickname);
-  // tic_server::TicCtrlr fwd_lin(fwd_lin_sn, fwd_lin_nickname);
+  tic_server::TicCtrlr fwd_lin(fwd_lin_sn, fwd_lin_nickname);
 
   // def_lin.resume();
-  // fwd_lin.resume();
+  fwd_lin.resume();
 
   tracking::BallTracker foosball(0);
 
@@ -87,9 +87,9 @@ int main(int argc, char** argv)
 
     int def_lin_stepper = std::floor(location_conversion::map_ranges(def_lin_pos, -0.045, 0.045, 0, 245));
 
-    // fwd_lin.set_position(def_lin_stepper);
+    fwd_lin.set_position(def_lin_stepper);
 
-    // ROS_INFO_STREAM("Stepper pos: " << fwd_lin.get_current_pos());
+    ROS_INFO_STREAM("Stepper pos: " << fwd_lin.get_current_pos());
 
     joint_vals.at(3) = def_lin_pos;
     joint_vals.at(2) = def_rot_pos;
@@ -104,7 +104,7 @@ int main(int argc, char** argv)
     r.sleep();
   }
 
-  // fwd_lin.deenergize();
+  fwd_lin.deenergize();
 
   return 0;
 }
