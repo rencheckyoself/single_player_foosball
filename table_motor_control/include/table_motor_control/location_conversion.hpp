@@ -6,6 +6,39 @@
 #include <utility>
 #include <algorithm>
 #include <cmath>
+#include "tic_server.hpp"
+
+namespace table
+{
+
+  struct RodState
+  {
+    double lin_pos; ///< rotational joint position
+    double rot_pos; ///< linear joint position
+  };
+
+  class TableController
+  {
+  public:
+
+  private:
+
+    RodState fwd_rod_joints; ///< forward rod joint states
+    RodState def_rod_joints; ///< defense rod joint states
+
+    int fwd_rot_steps; ///< forward rod rotational target stepper position
+    int fwd_lin_steps; ///< forward rod linear target stepper position
+
+    int def_rot_steps; ///< defense rod rotational target stepper position
+    int def_lin_steps; ///< defense rod linear target stepper position
+
+    tic_server::TicCtrlr fwd_rot; ///< attacking rotational rod controller
+    tic_server::TicCtrlr fwd_lin; ///< attacking linear rod controller
+    tic_server::TicCtrlr def_rot; ///< defensive rotational rod controller
+    tic_server::TicCtrlr def_lin; ///< defensive linear rod controller
+  };
+
+}
 
 namespace location_conversion
 {
@@ -30,7 +63,7 @@ namespace location_conversion
   /// \brief Use the x coordinate of the ball to determine the angular position of the rod
   /// \param pos the x coordinate of the ball
   /// \param thresh the threshold to send a kick command
-  /// \param rod_x_coord the x coordinate for the ball needs to be at to optimally kick the ball
+  /// \param rod_x_coord the x coordinate the ball needs to be at to optimally kick the ball
   /// \returns an anlge in radians to move the rod to
   /// \TODO: Account for ball velocity or recalculate thresh to account for the veloctiy
   double getAngularPosition(double pos, double thresh, double rod_x_coord);

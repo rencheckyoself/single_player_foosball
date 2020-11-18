@@ -1,0 +1,15 @@
+<launch>
+
+  <include file="$(find table_vision_sensing)/launch/start_tracking.launch">
+    <arg name="view_image" value="True"/>
+  </include>
+
+  <node name="simulation_game" type="simulation_game" pkg="table_gameplay_ai" output="screen">
+    <rosparam command="load" file="$(find table_gameplay_ai)/config/ball_locations.yaml"/>
+  </node>
+
+  <include file="$(find table_description)/launch/view_table.launch">
+    <arg name="use_gui" value="False"/>
+  </include>
+
+</launch>

@@ -75,7 +75,7 @@
 
     <joint name="${name}_fixed_joint" type="fixed">
       <origin xyz="${dir*dist} ${-field_width/2} ${rod_mountingheight}"/>
-      <parent link="field"/>
+      <parent link="table_base"/>
       <child link="${name}_mount_c"/>
     </joint>
 
@@ -138,7 +138,7 @@
 
     <joint name="${side}_side_wall_joint" type="fixed">
       <origin xyz="0 ${dir*field_width/2} 0" rpy="0 0 0" />
-      <parent link="field"/>
+      <parent link="table_base"/>
       <child link="${side}_side_wall"/>
     </joint>
   </xacro:macro>
@@ -159,7 +159,7 @@
 
     <joint name="${side}_end_wall_joint" type="fixed">
       <origin xyz="${dir*field_length/2} 0 ${0}" rpy="0 0 0" />
-      <parent link="field"/>
+      <parent link="table_base"/>
       <child link="${side}_end_wall_goal"/>
     </joint>
 
@@ -192,7 +192,7 @@
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </link>
 
-  <link name="field">
+  <link name="table_base">
     <visual>
       <origin xyz="0 0 ${-field_thickness/2}" rpy="0 0 0"/>
       <geometry>
@@ -203,8 +203,18 @@
       </material>
     </visual>
   </link>
-  <joint name="field_joint" type="fixed">
+  <joint name="table_base_joint" type="fixed">
     <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="base_link"/>
+    <child link="table_base"/>
+  </joint>
+
+  <link name="field">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </link>
+
+  <joint name="field_joint" type="fixed">
+    <origin xyz="${(-field_length + ball_diameter)/2} ${(-field_width + ball_diameter)/2} 0" rpy="0 0 0" />
     <parent link="base_link"/>
     <child link="field"/>
   </joint>
