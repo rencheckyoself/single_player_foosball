@@ -64,6 +64,7 @@ public:
     count = 0;
 
     // Ensure the image group directory is created
+    mkdir((full_directory).c_str(), 0777);
     mkdir((full_directory + image_group).c_str(), 0777);
 
     ROS_INFO_STREAM(image_group << "Capture: Using Directory:" << full_directory + image_group);
@@ -156,14 +157,14 @@ public:
 
     }
 
-    if(key == 'c')
-    {
-      cv::destroyWindow("Capture for " + image_group);
-
-      img = cv_ptr->image.clone();
-
-      cropImage();
-    }
+    // if(key == 'c')
+    // {
+    //   cv::destroyWindow("Capture for " + image_group);
+    //
+    //   img = cv_ptr->image.clone();
+    //
+    //   cropImage();
+    // }
   }
 
   void saveImage(cv::Mat pic)

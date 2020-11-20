@@ -73,12 +73,34 @@ Nodes:
 #### Training the cascade classifier:
 I have included the model I trained in the `cascade_data` folder, but if you don't have the same table/ball as my set up you may need to train your own cascade model.
 
-Navigate to the `table_vision_sensing` package and use these commands to the image set directory:
+OpenCV provides a great [walk-through](https://docs.opencv.org/3.4/dc/d88/tutorial_traincascade.html) for how to use their provided tools to generate the final output. Read through this first, then use the following to help with collecting your image dataset and generating the trained model.
+
+To collect your own image set using the camera mounted over the table use the `capture_training_image.launch` file. Start nodes to create a new directory inside the `table_vision_sensing` package called `training_data`. Inside will be the `.dat` files required for the OpenCV training pipeline and two directories corresponding to the saved images. After launching, two windows will be displayed one called "Capture for background" and "Capture for ball". To save an image for the background/negative set, click on the "Capture for background" window and click the "s" key. Follow the same process to save an image for the ball/positive set. All of the images in the background set should not contain the ball.
+
+If you want to add you your collected set later, just relaunch the file and the numbering will pick up where each set left off.
+
+After all of your images are collected, use the integrated annotation tool provided by OpenCV to properly annotate the ball/positive image set. Using the following:
 ```
-mkdir -p training_data/background
-mkdir training_data/ball
+opencv_annotation --annotations=[path to table_vision_sensing]/training_data/ball.dat --images=[path to table_vision_sensing]/training_data/ball
 ```
 
-To collect your own image set use the `capture_training_image.launch`. This will display two windows
+After the annonations have been completed, use the provided OpenCV tool to create the positive image set .vec file. Use the following command:
+```
+opencv_createsamples -vec [path to table_vision_sensing]/training_data/ball.vec -info [path to table_vision_sensing]/training_data/ball.dat -w 50 -h 50
+```
 
-OpenCV provides a great [walk-through](https://docs.opencv.org/3.4/dc/d88/tutorial_traincascade.html)! for how to use their provided tools to generate the final output.
+After the .vec file has been generated, use the cascade trainer to get the trained cascade model for ball detection. The following was my configuration but your mileage may vary.
+```
+mkdir [path to table_vision_sensing]/cascade_data
+opencv_traincascade -data [path to table_vision_sensing]/cascade_data -vec [path to table_vision_sensing]/training_data/ball.vec
+```
+
+### Gamplay
+This package is used as the main decision making pipeline based on the detected ball position and creates a joint state message that can be used by the urdf model for testing or converted to stepper commands using the `table_motor_control` package.
+
+Launch Files:
+- `start_game.launch`: Launches everything to play a game of foosball against the table
+- `start_simulation.launch`: Uses the real ball position on the table, but does not actuate the real motors only the urdf model in rviz.
+
+Nodes:
+ - `follow_ball`: The main node to decide the action and publish the joint state message.
