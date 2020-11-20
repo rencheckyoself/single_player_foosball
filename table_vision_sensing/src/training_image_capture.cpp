@@ -64,9 +64,9 @@ public:
     count = 0;
 
     // Ensure the image group directory is created
-    mkdir((full_directory + "/" + image_group).c_str(), 0777);
+    mkdir((full_directory + image_group).c_str(), 0777);
 
-    ROS_INFO_STREAM("Capture: Using Directory:" << full_directory);
+    ROS_INFO_STREAM(image_group << "Capture: Using Directory:" << full_directory + image_group);
 
     info_file.open(full_directory + image_group + ".dat", std::ios::in | std::ios::out | std::ios::app | std::ios::binary);
 
@@ -78,29 +78,42 @@ public:
       std::string digits;
       info_file.seekg(-1,std::ios_base::cur);
 
+      bool g_found = false;
+
       // loop through and save only the numbers to a seperate string
       while(info_file.peek() != '\n')
       {
         char c = info_file.peek();
         // check if the character is a number
-        if(c >= 48 && c <= 57)
+        if(g_found)
         {
-          digits += c;
+          if(c >= 48 && c <= 57)
+          {
+            ROS_INFO_STREAM(image_group << " Capture: " << c);
+            digits = c + digits;
+          }
         }
+        else if(c == 'g')
+        {
+          g_found = true;
+        }
+
+        ROS_INFO_STREAM(image_group << " Capture: " << digits);
 
         info_file.seekg(-1, std::ios_base::cur);
       }
 
+
       // set the count number based number in the last row of the text file
       count = std::stoi(digits);
 
-      ROS_INFO_STREAM("ImCa: Image count starting at " << count);
+      ROS_INFO_STREAM(image_group << " Capture: Image count starting at " << count);
 
     }
 
     else
     {
-      ROS_INFO_STREAM("ImCa: Using New File for Annotation.");
+      ROS_INFO_STREAM(image_group << " Capture: Using New File for Annotation.");
       info_file.clear(); // reset the image file
     }
   }

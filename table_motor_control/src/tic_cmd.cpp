@@ -49,15 +49,14 @@ int main(int argc, char** argv)
   ROS_INFO_STREAM("TICCMD: Defense Rotation Name: " << def_rot_nickname);
   ROS_INFO_STREAM("TICCMD: Defense Linear Name: " << def_lin_nickname);
 
-  // tic_server::TicCtrlr fwd_rot(fwd_rot_sn, fwd_rot_nickname);
-  // tic_server::TicCtrlr fwd_lin(fwd_lin_sn, fwd_lin_nickname);
+  tic_server::TicCtrlr fwd_rot(fwd_rot_sn, fwd_rot_nickname);
+  tic_server::TicCtrlr fwd_lin(fwd_lin_sn, fwd_lin_nickname);
 
   tic_server::TicCtrlr def_rot(def_rot_sn, def_rot_nickname);
   tic_server::TicCtrlr def_lin(def_lin_sn, def_lin_nickname);
 
-
-  // fwd_rot.offer_services(n);
-  // fwd_lin.offer_services(n);
+  fwd_rot.offer_services(n);
+  fwd_lin.offer_services(n);
   def_rot.offer_services(n);
   def_lin.offer_services(n);
 

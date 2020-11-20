@@ -70,6 +70,5 @@ namespace location_conversion
 
   /// \brief reads in the joint state message and converts it to the proper stepper command
   void jointMsg_to_Steppers();
-
 }
 #endif
