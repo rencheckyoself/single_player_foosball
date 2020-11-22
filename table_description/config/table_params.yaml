@@ -24,6 +24,6 @@ wall_height: 0.062 # height of the side walls
 goal_height: 0.040 # height of the goal opening
 goal_width: 0.080 # width of the goal opening
 
-rod_travel_distance: 0.090 # distance of the rod travel
+rod_travel_distance: 0.090 # the linear distance a rod can travel
 
 # Interial Parameters
