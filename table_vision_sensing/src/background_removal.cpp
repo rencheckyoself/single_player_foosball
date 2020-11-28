@@ -29,22 +29,19 @@ class ImageConverter
   cv::Ptr<cv::BackgroundSubtractor> pBackSub;
   cv::Mat fgMask;
 
+  cv::Scalar blue = cv::Scalar(256, 0, 0);
+  cv::Scalar green = cv::Scalar(0, 256, 0);
+  cv::Scalar red = cv::Scalar(0, 0, 256);
+
 public:
   ImageConverter() : it_(nh_)
   {
     // Subscrive to input video feed and publish output video feed
-    image_sub_ = it_.subscribe("/camera/image_rect_color", 1, &ImageConverter::imageCb, this);
+    image_sub_ = it_.subscribe("/camera/image_rect", 1, &ImageConverter::imageCb, this);
     image_pub_ = it_.advertise("/image_converter/fg_mask", 1);
 
     // intialize background subtraction
     pBackSub = cv::createBackgroundSubtractorKNN(350, 10000.0, false);
-
-    // cv::namedWindow(OPENCV_WINDOW);
-  }
-
-  ~ImageConverter()
-  {
-    // cv::destroyWindow(OPENCV_WINDOW);
   }
 
   void imageCb(const sensor_msgs::ImageConstPtr& msg)
@@ -62,17 +59,44 @@ public:
       return;
     }
 
-    // cv::cvtColor(cv_ptr->image, cv_ptr->image, cv::COLOR_BGR2HSV);
+    cv::Rect roi(50,30,150,180);
 
-    pBackSub->apply(cv_ptr->image, fgMask);
+    cv::Mat cropped_img = cv_ptr->image(roi);
+
+    pBackSub->apply(cropped_img, fgMask);
+
+    cv::Mat detection_img;
+
+    cv::Mat d_element = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(7,7));
+    cv::dilate(fgMask, detection_img, d_element);
+
+    std::vector<std::vector<cv::Point>> contours;
+    std::vector<cv::Vec4i> hierarchy;
+
+    cv::findContours(detection_img, contours, hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+
+    std::vector<cv::Rect> boundRect( contours.size() );
+    std::vector<cv::Point2f> centers( contours.size() );
+    std::vector<float> radius( contours.size() );
+
+    for( size_t i = 0; i < contours.size(); i++ )
+    {
+        boundRect.at(i) = cv::boundingRect(contours[i]);
+        cv::minEnclosingCircle(contours[i], centers[i], radius[i]);
+
+        cv::drawContours(detection_img, contours, (int)i, red, 2, cv::LINE_8, hierarchy, 0);
+        cv::rectangle(cropped_img, boundRect.at(i), green, 2);
+        cv::circle(cropped_img, centers[i], 2, blue, -1);
+    }
 
     // Update GUI Window
     cv::imshow("Rectified", cv_ptr->image);
+    cv::imshow("Cropped", cropped_img);
 
     cv::Mat masked_image;
-    cv::cvtColor(fgMask, masked_image, cv::COLOR_GRAY2BGR);
-    cv::bitwise_and(cv_ptr->image, masked_image, masked_image);
-    cv::imshow("Masked Image", masked_image);
+    // cv::cvtColor(fgMask, masked_image, cv::COLOR_GRAY2BGR);
+    // cv::bitwise_and(cv_ptr->image, masked_image, masked_image);
+    cv::imshow("Mask", fgMask);
 
     cv::waitKey(3);
 

@@ -39,8 +39,6 @@ catkin_make
 
 The CAD and Bill of Materials are located at this google drive [link](https://drive.google.com/drive/folders/1ccFXVZE29upyrK4uFZC98GBmM7wjYVV8?usp=sharing). You will an assembly procedure along with pictures depicting some of my build process and final assembly.
 
-
-
 ## Required Configuration
 
 1. Update `table_motor_control/config/motor_ids.yaml` with the serial numbers for your specific TIC boards. These can be obtained by using the ticgui or ticcli.

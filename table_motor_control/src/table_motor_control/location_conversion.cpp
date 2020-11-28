@@ -35,6 +35,7 @@ namespace location_conversion
       if(pos > rod_x_coord + thresh) return 0.5; // return an angle slightly back
       else return -1.5; // tell the table to kick
     }
+    else if(pos > rod_x_coord - thresh)
 
     return 1.5; // raise players
   }
