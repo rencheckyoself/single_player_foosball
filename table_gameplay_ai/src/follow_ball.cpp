@@ -11,12 +11,13 @@
 
 #include <ros/ros.h>
 
+#include <XmlRpcValue.h>
+
 #include <sensor_msgs/JointState.h>
 #include <visualization_msgs/Marker.h>
 
 #include "ball_prediction.hpp"
-#include "table_motor_control/tic_server.hpp"
-#include "table_motor_control/location_conversion.hpp"
+#include "table_ai.hpp"
 
 /// \brief main function to create the real_waypoints node
 int main(int argc, char** argv)
@@ -29,101 +30,103 @@ int main(int argc, char** argv)
   ros::Publisher joint_pub = n.advertise<sensor_msgs::JointState>("joint_states", 1);
   ros::Publisher vis_pub = n.advertise<visualization_msgs::Marker>( "visualization_marker", 1);
 
+  XmlRpc::XmlRpcValue world_coordinates;
+  XmlRpc::XmlRpcValue image_coordinates;
+  double error_threshold;
 
-  std::string fwd_rot_sn, fwd_lin_sn, def_rot_sn, def_lin_sn;
-  std::string fwd_rot_nickname, fwd_lin_nickname, def_rot_nickname, def_lin_nickname;
+  table::ControllerInfo tic_info;
+  table::CalibrationVals config;
 
-  np.getParam("fwd_rot/serial_number", fwd_rot_sn);
-  np.getParam("fwd_rot/nickname", fwd_rot_nickname);
+  // Read in homography configuration
+  np.getParam("world_coordinates", world_coordinates);
+  np.getParam("image_coordinates", image_coordinates);
+  np.getParam("error_threshold", error_threshold);
 
-  np.getParam("fwd_lin/serial_number", fwd_lin_sn);
-  np.getParam("fwd_lin/nickname", fwd_lin_nickname);
+  // Read in tic controller configurations
+  np.getParam("fwd_rot/serial_number", tic_info.fwd_rot_sn);
+  np.getParam("fwd_rot/nickname", tic_info.fwd_rot_nickname);
 
-  np.getParam("def_rot/serial_number", def_rot_sn);
-  np.getParam("def_rot/nickname", def_rot_nickname);
+  np.getParam("fwd_lin/serial_number", tic_info.fwd_lin_sn);
+  np.getParam("fwd_lin/nickname", tic_info.fwd_lin_nickname);
 
-  np.getParam("def_lin/serial_number", def_lin_sn);
-  np.getParam("def_lin/nickname", def_lin_nickname);
+  np.getParam("def_rot/serial_number", tic_info.def_rot_sn);
+  np.getParam("def_rot/nickname", tic_info.def_rot_nickname);
 
-  ROS_INFO_STREAM("TICCMD: Forward Rotation ID: " << fwd_rot_sn);
-  ROS_INFO_STREAM("TICCMD: Forward Linear ID: " << fwd_lin_sn);
-  ROS_INFO_STREAM("TICCMD: Defense Rotation ID: " << def_rot_sn);
-  ROS_INFO_STREAM("TICCMD: Defense Linear ID: " << def_lin_sn);
+  np.getParam("def_lin/serial_number", tic_info.def_lin_sn);
+  np.getParam("def_lin/nickname", tic_info.def_lin_nickname);
 
-  ROS_INFO_STREAM("TICCMD: Forward Rotation Name: " << fwd_rot_nickname);
-  ROS_INFO_STREAM("TICCMD: Forward Linear Name: " << fwd_lin_nickname);
-  ROS_INFO_STREAM("TICCMD: Defense Rotation Name: " << def_rot_nickname);
-  ROS_INFO_STREAM("TICCMD: Defense Linear Name: " << def_lin_nickname);
+  // Read in configuration parameters
+  np.getParam("lower_joint_limit", config.lin_joint_limits.first);
+  np.getParam("upper_joint_limit", config.lin_joint_limits.second);
 
-  tic_server::TicCtrlr def_rot(def_rot_sn, def_rot_nickname);
-  tic_server::TicCtrlr def_lin(def_lin_sn, def_lin_nickname);
+  np.getParam("lower_lin_steps", config.lin_step_limits.first);
+  np.getParam("upper_lin_steps", config.lin_step_limits.second);
 
-  tic_server::TicCtrlr fwd_rot(fwd_rot_sn, fwd_rot_nickname);
-  tic_server::TicCtrlr fwd_lin(fwd_lin_sn, fwd_lin_nickname);
+  np.getParam("linear_hysteresis", config.linear_hysteresis);
 
-  def_rot.resume();
-  def_lin.resume();
+  np.getParam("kick_trigger_threshold", config.kick_trigger_threshold);
 
-  fwd_rot.resume();
-  fwd_lin.resume();
+  np.getParam("def_rod_xpos", config.def_rod_xpos);
+  np.getParam("fwd_rod_xpos", config.fwd_rod_xpos);
 
-  def_rot.reset_global_position();
-  def_lin.reset_global_position();
+  // Read in angle detection params
+  np.getParam("fwd/roi_x", config.fwd_rod.roi_x);
+  np.getParam("fwd/roi_y", config.fwd_rod.roi_y);
+  np.getParam("fwd/roi_width", config.fwd_rod.roi_width);
+  np.getParam("fwd/roi_height", config.fwd_rod.roi_height);
 
-  fwd_rot.reset_global_position();
-  fwd_lin.reset_global_position();
+  np.getParam("fwd/area_limit", config.fwd_rod.area_limit);
+  np.getParam("fwd/end_kick_width", config.fwd_rod.end_kick_width);
+  np.getParam("fwd/end_kick_x", config.fwd_rod.end_kick_x);
 
-  tracking::BallTracker foosball(0);
+  np.getParam("def/roi_x", config.def_rod.roi_x);
+  np.getParam("def/roi_y", config.def_rod.roi_y);
+  np.getParam("def/roi_width", config.def_rod.roi_width);
+  np.getParam("def/roi_height", config.def_rod.roi_height);
 
-  ros::Rate r(80);
+  np.getParam("def/area_limit", config.def_rod.area_limit);
+  np.getParam("def/end_kick_width", config.def_rod.end_kick_width);
+  np.getParam("def/end_kick_x", config.def_rod.end_kick_x);
 
+  ROS_INFO_STREAM("TICCMD: Forward Rotation ID: " << tic_info.fwd_rot_sn);
+  ROS_INFO_STREAM("TICCMD: Forward Linear ID: " << tic_info.fwd_lin_sn);
+  ROS_INFO_STREAM("TICCMD: Defense Rotation ID: " << tic_info.def_rot_sn);
+  ROS_INFO_STREAM("TICCMD: Defense Linear ID: " << tic_info.def_lin_sn);
+
+  ROS_INFO_STREAM("TICCMD: Forward Rotation Name: " << tic_info.fwd_rot_nickname);
+  ROS_INFO_STREAM("TICCMD: Forward Linear Name: " << tic_info.fwd_lin_nickname);
+  ROS_INFO_STREAM("TICCMD: Defense Rotation Name: " << tic_info.def_rot_nickname);
+  ROS_INFO_STREAM("TICCMD: Defense Linear Name: " << tic_info.def_lin_nickname);
+
+  std::vector<std::vector<double>> wc = tracking::parse_points_data(world_coordinates);
+  std::vector<std::vector<double>> ic = tracking::parse_points_data(image_coordinates);
+
+  tracking::BallTracker foosball(0, wc, ic, error_threshold);
   foosball.testExtrinsicResults();
 
-  sensor_msgs::JointState joint_msg;
+  config.xrange = foosball.getXRange();
+  config.yrange = foosball.getYRange();
 
+  table::RealFoosballTable robot_player(tic_info, config);
+
+  ros::Rate r(100);
+
+  sensor_msgs::JointState joint_msg;
   std::vector<std::string> joint_names = {"white_attack_rot_joint", "white_attack_lin_joint", "white_goalie_rot_joint", "white_goalie_lin_joint", "grey_attack_rot_joint", "grey_attack_lin_joint", "grey_goalie_rot_joint", "grey_goalie_lin_joint"};
   joint_msg.name = joint_names;
 
-  std::pair<double,double> xrange = foosball.getXRange();
-  std::pair<double,double> yrange = foosball.getYRange();
-
   visualization_msgs::Marker ball_marker;
   ball_marker.header.frame_id = "field";
-  
 
   while(ros::ok())
   {
-    std::vector<double> joint_vals(joint_names.size(), 0);
 
     // Get the position of the ball
     cv::Point3d pos = foosball.getWorldPosition();
 
-    // ROS_INFO_STREAM(pos);
+    robot_player.moveTable(pos);
 
-    double lin_pos = location_conversion::getLinearPosition(pos.y, yrange, std::make_pair<double,double>(-0.045, 0.045));
-    double def_rot_pos = location_conversion::getAngularPosition(pos.x, 0.025, 0.067);
-    double fwd_rot_pos = location_conversion::getAngularPosition(pos.x, 0.025, 0.257);
-
-    int lin_stepper = std::floor(location_conversion::map_ranges(lin_pos, -0.045, 0.045, 0, 240));
-
-    int def_rot_stepper = std::floor(location_conversion::map_ranges(def_rot_pos, -3.14, 3.14, -100, 100));
-    int fwd_rot_stepper = std::floor(location_conversion::map_ranges(fwd_rot_pos, -3.14, 3.14, -100, 100));
-
-    if(std::abs(lin_stepper - def_lin.get_current_pos()) > 10)
-    {
-      def_lin.set_position(lin_stepper);
-      fwd_lin.set_position(lin_stepper);
-    }
-
-    def_rot.set_position(def_rot_stepper);
-    fwd_rot.set_position(fwd_rot_stepper);
-
-    ROS_INFO_STREAM("Stepper pos: " << def_rot.get_current_pos());
-
-    joint_vals.at(0) = fwd_rot_pos;
-    joint_vals.at(1) = lin_pos;
-    joint_vals.at(2) = def_rot_pos;
-    joint_vals.at(3) = lin_pos;
+    std::vector<double> joint_vals = robot_player.getCurrentJointStates();
 
     joint_msg.header.stamp = ros::Time::now();
     joint_msg.position = joint_vals;
@@ -157,12 +160,5 @@ int main(int argc, char** argv)
 
     r.sleep();
   }
-
-  fwd_rot.deenergize();
-  fwd_lin.deenergize();
-
-  def_rot.deenergize();
-  def_lin.deenergize();
-
   return 0;
 }

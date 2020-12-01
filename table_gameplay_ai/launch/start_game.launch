@@ -5,7 +5,9 @@
   </include>
 
   <node name="follow_ball" type="follow_ball" pkg="table_gameplay_ai" output="screen">
-    <rosparam command="load" file="$(find table_gameplay_ai)/config/ball_locations.yaml"/>
+    <rosparam command="load" file="$(find table_gameplay_ai)/config/homography_config.yaml"/>
+    <rosparam command="load" file="$(find table_gameplay_ai)/config/player_angle_detection.yaml"/>
+    <rosparam command="load" file="$(find table_gameplay_ai)/config/command_generation_config.yaml"/>
     <rosparam command="load" file="$(find table_motor_control)/config/motor_ids.yaml"/>
   </node>
 

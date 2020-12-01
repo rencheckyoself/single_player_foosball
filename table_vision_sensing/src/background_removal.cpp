@@ -41,7 +41,7 @@ public:
     image_pub_ = it_.advertise("/image_converter/fg_mask", 1);
 
     // intialize background subtraction
-    pBackSub = cv::createBackgroundSubtractorKNN(350, 10000.0, false);
+    pBackSub = cv::createBackgroundSubtractorKNN(100, 1000, false);
   }
 
   void imageCb(const sensor_msgs::ImageConstPtr& msg)
@@ -61,44 +61,58 @@ public:
 
     cv::Rect roi(50,30,150,180);
 
-    cv::Mat cropped_img = cv_ptr->image(roi);
+    cv::Mat cropped_img = cv_ptr->image(roi).clone();
 
     pBackSub->apply(cropped_img, fgMask);
 
     cv::Mat detection_img;
 
-    cv::Mat d_element = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(7,7));
+    cv::Mat e_element = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5,5));
+    cv::Mat d_element = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(11,11));
     cv::dilate(fgMask, detection_img, d_element);
+    cv::erode(detection_img, detection_img, e_element);
 
     std::vector<std::vector<cv::Point>> contours;
     std::vector<cv::Vec4i> hierarchy;
 
     cv::findContours(detection_img, contours, hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
-    std::vector<cv::Rect> boundRect( contours.size() );
-    std::vector<cv::Point2f> centers( contours.size() );
-    std::vector<float> radius( contours.size() );
+    int max_element = -1;
+    double max_area = 0;
 
     for( size_t i = 0; i < contours.size(); i++ )
     {
-        boundRect.at(i) = cv::boundingRect(contours[i]);
-        cv::minEnclosingCircle(contours[i], centers[i], radius[i]);
-
-        cv::drawContours(detection_img, contours, (int)i, red, 2, cv::LINE_8, hierarchy, 0);
-        cv::rectangle(cropped_img, boundRect.at(i), green, 2);
-        cv::circle(cropped_img, centers[i], 2, blue, -1);
+      double temp_area = cv::contourArea(contours.at(i));
+      if(temp_area > max_area)
+      {
+        max_element = i;
+        max_area = temp_area;
+      }
     }
+
+    if(max_element >= 0 && max_area > 1500)
+    {
+      cv::Rect boundRect = cv::boundingRect(contours[max_element]);
+
+      cv::rectangle(cropped_img, boundRect, green, 2);
+
+      cv::Point2f center(boundRect.x + boundRect.width/2, boundRect.y + boundRect.height/2);
+
+      cv::circle(cropped_img, center, 4, blue, -1);
+
+      std::cout << "Area: " << max_area << "\nWidth: " << boundRect.width << "\nTop-Left X Val: " << boundRect.x << std::endl;
+    }
+
 
     // Update GUI Window
     cv::imshow("Rectified", cv_ptr->image);
     cv::imshow("Cropped", cropped_img);
 
-    cv::Mat masked_image;
-    // cv::cvtColor(fgMask, masked_image, cv::COLOR_GRAY2BGR);
-    // cv::bitwise_and(cv_ptr->image, masked_image, masked_image);
     cv::imshow("Mask", fgMask);
+    cv::imshow("Edited Mask", detection_img);
 
-    cv::waitKey(3);
+
+    cv::waitKey(1);
 
     // Output modified video stream
 

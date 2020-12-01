@@ -42,9 +42,11 @@ The CAD and Bill of Materials are located at this google drive [link](https://dr
 ## Required Configuration
 
 1. Update `table_motor_control/config/motor_ids.yaml` with the serial numbers for your specific TIC boards. These can be obtained by using the ticgui or ticcli.
-2. Calibrate your camera. I have included the calibration file for my camera in the package files, but it may not be suitable for yours. See below for more info.
-3. If you are using a different ball and/or table you may need to retrain the cascade classifier. See below for more info.
-4. Known pixel contains know pairs of world location to pixel location in order to calculate the homography.
+2. Calibrate your camera. I have included the calibration file for my camera in the package files, but it may not be suitable for yours.
+3. If you are using a different ball and/or table you may need to retrain the cascade classifier.
+4. Update the pixel locations for the known pairs of world locations to pixel locations in order to calculate the homography.
+5. Update the parameters to generate the joint_states/stepper commands to account for the differences in the camera position and calibration.
+6. Update the parameters for the player angle detection.
 
 ### Tic Serial Numbers:
 After install the tic software, open a terminal and use the command `ticgui`. Plug in boards one at a time and copy over the serial number in to the `motor_ids.yaml` file. Be sure that the controller is associated to the correct variable.
@@ -86,9 +88,10 @@ opencv_traincascade -data [path to table_vision_sensing]/cascade_data -vec [path
 ```
 
 ### Homography Calculation
-In order to transform the balls image coordinates to world coordinates, the system needs to know some known pairs. So you will need to update the `ball_locations.yaml` file in the `table_gameplay_ai/config` directory to adjust for the slight differences in the camera location. Included in that directory is a template corresponding to the world positions already listed in the `ball_locations.yaml` file and an .stl for a stand that neatly fits into the circles on the template. Print out two copies of the template, attach them along the middle and and place it on the field.
+In order to transform the balls image coordinates to world coordinates, the system needs to know some known pairs. So you will need to update the `homography_config.yaml` file in the `table_gameplay_ai/config` directory to adjust for the slight differences in the camera location. Included in that directory is a template corresponding to the world positions already listed in the `homography_config.yaml` file and an .stl for a stand that neatly fits into the circles on the template. Print out two copies of the template, attach them along the middle and and place it on the field.
 
-Then start up the ball tracking node and echo the `/BallPosition` topic to see the ball's pixel coordinates:
+Then start up the ball tracking node, echo the `/BallPosition` topic in a separate terminal and record the average `(x,y)` pixel values in the `.yaml` file.
+
 ```
 roslaunch table_vision_sensing start_tracking.launch view_image:=true
 rostopic echo /BallPosition
@@ -97,6 +100,20 @@ rostopic echo /BallPosition
 [INSERT EXAMPLE PIC]
 
 Be sure that as the image coordinates are entered in to the .yaml file, they are entered on the correct line.
+
+### Command Generation Configuration
+
+### Player Angle Detection Configuration
+
+## How to Run:
+
+Position players in the assumed starting position.
+
+Switch button
+
+`[insert proper launch command]`
+
+Throw ball onto table and play
 
 ## Packages
 
@@ -146,4 +163,4 @@ Nodes:
 - `follow_ball`: The main node to decide the action and publish the joint state message.
 
 Config:
-- `ball_locations.yaml`: contains know pairs of world location to pixel location in order to calculate the homography.
+- `homography_config.yaml`: contains know pairs of world location to pixel location in order to calculate the homography.

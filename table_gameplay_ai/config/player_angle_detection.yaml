@@ -1,0 +1,21 @@
+# Offensive Rod
+fwd:
+    roi_x: 50 # ROI upper left hand corner pixel x coordinate
+    roi_y: 30 # ROI upper left hand corner pixel y coordinate
+    roi_width: 150 # ROI pixel width
+    roi_height: 180 # ROI pixel height
+
+    area_limit: 1500 # threshold to filter out non_player contours
+    end_kick_width: 117 # the width of the rectangle fit to the player at the end of a kick
+    end_kick_x: 24 # the top left corner x coordinate of the rectangle fit to the player at the end of a kick
+
+# Defensive Rod
+def:
+  roi_x: 50
+  roi_width: 150
+  roi_y: 30
+  roi_height: 180
+
+  area_limit: 1500
+  end_kick_width: 117
+  end_kick_x: 24

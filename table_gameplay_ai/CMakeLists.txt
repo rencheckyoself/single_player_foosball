@@ -133,6 +133,7 @@ include_directories(
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
   src/${PROJECT_NAME}/ball_prediction.cpp
+	src/${PROJECT_NAME}/table_ai.cpp
 )
 
 ## Add cmake target dependencies of the library
@@ -144,7 +145,7 @@ add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EX
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(${PROJECT_NAME}_follow_ball src/follow_ball.cpp)
-add_executable(${PROJECT_NAME}_simulation_game src/simulation_game.cpp)
+# add_executable(${PROJECT_NAME}_simulation_game src/simulation_game.cpp)
 
 
 ## Rename C++ executable without prefix
@@ -152,13 +153,13 @@ add_executable(${PROJECT_NAME}_simulation_game src/simulation_game.cpp)
 ## target back to the shorter version for ease of user use
 ## e.g. "rosrun someones_pkg node" instead of "rosrun someones_pkg someones_pkg_node"
 set_target_properties(${PROJECT_NAME}_follow_ball PROPERTIES OUTPUT_NAME follow_ball PREFIX "")
-set_target_properties(${PROJECT_NAME}_simulation_game PROPERTIES OUTPUT_NAME simulation_game PREFIX "")
+# set_target_properties(${PROJECT_NAME}_simulation_game PROPERTIES OUTPUT_NAME simulation_game PREFIX "")
 
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(${PROJECT_NAME}_simulation_game ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(${PROJECT_NAME}_simulation_game ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME}_follow_ball ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(${PROJECT_NAME}_simulation_game ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 
 ## Specify libraries to link a library or executable target against
@@ -169,12 +170,12 @@ target_link_libraries(${PROJECT_NAME}_follow_ball
   ${table_motor_control_LIBRARIES}
 )
 
-target_link_libraries(${PROJECT_NAME}_simulation_game
-  ${catkin_LIBRARIES}
-  ${OpenCV_LIBRARIES}
-	${PROJECT_NAME}
-  ${table_motor_control_LIBRARIES}
-)
+# target_link_libraries(${PROJECT_NAME}_simulation_game
+#   ${catkin_LIBRARIES}
+#   ${OpenCV_LIBRARIES}
+# 	${PROJECT_NAME}
+#   ${table_motor_control_LIBRARIES}
+# )
 
 #############
 ## Install ##
@@ -192,7 +193,8 @@ target_link_libraries(${PROJECT_NAME}_simulation_game
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-install(TARGETS ${PROJECT_NAME}_follow_ball ${PROJECT_NAME}_simulation_game
+install(TARGETS ${PROJECT_NAME}_follow_ball
+	# ${PROJECT_NAME}_simulation_game
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

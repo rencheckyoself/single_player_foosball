@@ -20,6 +20,9 @@ namespace tic_server
   {
   public:
 
+    /// \brief default constructor
+    TicCtrlr() {};
+
     /// \brief Main constructor
     /// \param desired_serial_number string of numbers to uniquely identify a tic controller
     /// \param name a unique readable nickename for the tic controller

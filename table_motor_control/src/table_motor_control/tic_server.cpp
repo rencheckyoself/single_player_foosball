@@ -30,7 +30,7 @@ namespace tic_server
     return handle.get_variables().get_current_position();
   }
 
-  bool TicCtrlr::set_position(table_motor_control::Int32::Request &req, table_motor_control::Int32::Response &res)
+  bool TicCtrlr::set_position(table_motor_control::Int32::Request &req, table_motor_control::Int32::Response &)
   {
     set_position(req.data);
     return 1;
@@ -42,7 +42,7 @@ namespace tic_server
     handle.set_target_position(val);
   }
 
-  bool TicCtrlr::reset_global_position(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res)
+  bool TicCtrlr::reset_global_position(std_srvs::Empty::Request &, std_srvs::Empty::Response &)
   {
     reset_global_position();
     return 1;
@@ -75,13 +75,13 @@ namespace tic_server
     handle.set_settings(s);
   }
 
-  bool TicCtrlr::import_settings(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res)
+  bool TicCtrlr::import_settings(std_srvs::Empty::Request&, std_srvs::Empty::Response&)
   {
     import_settings();
     return 1;
   }
 
-  bool TicCtrlr::resume(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res)
+  bool TicCtrlr::resume(std_srvs::Empty::Request&, std_srvs::Empty::Response&)
   {
     resume();
     return 1;
@@ -96,7 +96,7 @@ namespace tic_server
     handle.energize();
   }
 
-  bool TicCtrlr::deenergize(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res)
+  bool TicCtrlr::deenergize(std_srvs::Empty::Request&, std_srvs::Empty::Response&)
   {
     deenergize();
     return 1;

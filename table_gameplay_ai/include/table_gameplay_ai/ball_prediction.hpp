@@ -3,19 +3,15 @@
 #ifndef TRACKING_INCLUDE_GUARD_HPP
 #define TRACKING_INCLUDE_GUARD_HPP
 
-// #include <iostream>
 #include <utility>
 
 #include <ros/ros.h>
 
 #include <geometry_msgs/Point.h>
 
-#include <XmlRpcValue.h>
-
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
-
 
 namespace tracking
 {
@@ -25,12 +21,13 @@ namespace tracking
   {
   public:
 
-    /// \brief default contrsuctor
+    /// \brief default constructor
     BallTracker() {};
 
     /// \brief provide the known z height to assume the ball is always at
     /// \param z the z coordinate of the ball in the world frame
-    BallTracker(double z);
+    /// \param
+    BallTracker(double z, std::vector<std::vector<double>> wc, std::vector<std::vector<double>> ic, double e_thresh);
 
     /// \brief Convert the balls image position to real world coordinates
     /// \returns the xyz postion of the ball relative to the world frame defined by the points in ball_locations.yaml

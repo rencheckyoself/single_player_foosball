@@ -4,23 +4,9 @@
 namespace tracking
 {
 
-  BallTracker::BallTracker(double z) : zw(z)
+  BallTracker::BallTracker(double z, std::vector<std::vector<double>> wc, std::vector<std::vector<double>> ic, double e_thresh) : zw(z), error_threshold(e_thresh)
   {
-
     ros::NodeHandle n;
-    ros::NodeHandle np("~");
-
-    XmlRpc::XmlRpcValue world_coordinates;
-    XmlRpc::XmlRpcValue image_coordinates;
-    std::vector<double> camera_matrix;
-
-    np.getParam("world_coordinates", world_coordinates);
-    np.getParam("image_coordinates", image_coordinates);
-    np.getParam("error_threshold", error_threshold);
-
-
-    std::vector<std::vector<double>> wc = parse_points_data(world_coordinates);
-    std::vector<std::vector<double>> ic = parse_points_data(image_coordinates);
 
     xrange = std::make_pair(1000.0, -1000.0);
     yrange = std::make_pair(1000.0, -1000.0);
@@ -50,7 +36,7 @@ namespace tracking
     // Print Pairs
     for(unsigned int i = 0; i < world_points3d.size(); i++)
     {
-      ROS_INFO_STREAM("Coord Pair " << i << "\n\tWorld: " << world_points3d.at(i) << "\n\tImage: " << image_points.at(i));
+      std::cout << "Coord Pair " << i << "\n\tWorld: " << world_points3d.at(i) << "\n\tImage: " << image_points.at(i);
     }
 
     // Calculate extrinsic properties
@@ -74,7 +60,7 @@ namespace tracking
 
       if(norm > error_threshold)
       {
-        ROS_WARN_STREAM("Test Error exceeds threshold for point " << i <<". Error is " << norm);
+        std::cout << "Test Error exceeds threshold for point " << i <<". Error is " << norm;
         return true;
       }
     }
@@ -153,21 +139,20 @@ namespace tracking
     // t_w(1,0) = translation_est.at(1);
     // t_w(2,0) = translation_est.at(2);
     //
-    // ROS_INFO_STREAM("GUESSES: \n");
-    // ROS_INFO_STREAM("Rotation: \n" << rvec);
-    // ROS_INFO_STREAM("Translation: \n" << t_w);
+    // std::cout << "GUESSES: \n";
+    // std::cout << "Rotation: \n" << rvec;
+    // std::cout << "Translation: \n" << t_w;
 
     // Get R and t to convert to the world frame
     // using rectified image, so do not need distortion params
 
-    // ROS_INFO_STREAM("#World: " << world_points3d.size() << " #Image: " << image_points.size());
+    // std::cout << "#World: " << world_points3d.size() << " #Image: " << image_points.size();
     // cv::solvePnP(world_points3d, image_points, intrinsic, cv::Mat(), rvec, t_w, false);
     //
     // cv::Rodrigues(rvec, R_w);
     //
     // std::cout << R_w << std::endl;
     // std::cout << t_w << std::endl;
-
   }
 
   std::vector<std::vector<double>> parse_points_data(XmlRpc::XmlRpcValue point_data)
