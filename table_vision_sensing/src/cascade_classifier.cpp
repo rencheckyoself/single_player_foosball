@@ -38,7 +38,7 @@ public:
     // Load the trained model
     if(!ball_finder.load("/home/michaelrencheck/FinalProject/src/table_vision_sensing/cascade_data/cascade.xml"))
     {
-      ROS_ERROR_STREAM("Casade not loaded properly");
+      ROS_ERROR_STREAM("Cascade not loaded properly");
       ros::shutdown();
     }
   }

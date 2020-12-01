@@ -13,6 +13,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
 
+#include "table_vision_sensing/RodState.h"
+
 class ImageConverter
 {
   ros::NodeHandle nh_;
@@ -22,16 +24,20 @@ class ImageConverter
   image_transport::Publisher image_pub_;
 
   ros::Subscriber ball_pos_sub;
-  ros::Subscriber camera_info_sub;
+  ros::Subscriber def_rect_sub;
+  ros::Subscriber fwd_rect_sub;
 
   ros::Time last_frame_time;
   ros::Time current_frame_time;
 
   int point_radius = 5;
 
-  image_geometry::PinholeCameraModel cam_model_;
-
   cv::Point ball_loc;
+
+  cv::Rect def_rect, fwd_rect;
+
+  bool def_state = false;
+  bool fwd_state = false;
 
 public:
   ImageConverter() : it_(nh_)
@@ -41,24 +47,19 @@ public:
 
     // Subscrive to input video feed and publish output video feed
     image_sub_ = it_.subscribe("/camera/image_rect_color", 1, &ImageConverter::imageCb, this);
-    image_pub_ = it_.advertise("/image_converter/output_video", 1);
-
-    camera_info_sub = n.subscribe("/camera/camera_info", 1, &ImageConverter::cameraInfoCb, this);
 
     ball_pos_sub = n.subscribe("BallPosition", 1, &ImageConverter::ballPosCB, this);
+    def_rect_sub = n.subscribe("Def_RodState", 1, &ImageConverter::defRodCB, this);
+    fwd_rect_sub = n.subscribe("Fwd_RodState", 1, &ImageConverter::fwdRodCB, this);
+
 
     np.getParam("point_radius", point_radius);
 
     current_frame_time = ros::Time::now();
     last_frame_time = ros::Time::now();
-  }
 
-  ~ImageConverter() {}
-
-  void cameraInfoCb(const sensor_msgs::CameraInfoConstPtr& info_msg)
-  {
-    // ROS_INFO_STREAM("Set Camera Model");
-    cam_model_.fromCameraInfo(info_msg);
+    def_rect = cv::Rect(0,0,0,0);
+    fwd_rect = cv::Rect(0,0,0,0);
   }
 
   void imageCb(const sensor_msgs::ImageConstPtr& msg)
@@ -79,26 +80,29 @@ public:
     int fps = 1.0 / (msg->header.stamp - last_frame_time).toSec();
     last_frame_time = msg->header.stamp;
 
-    cv::circle(cv_ptr->image, ball_loc, 5, cv::Scalar(0,0,255), -1);
-    // ROS_INFO_STREAM("Ball Coordinates: " << ball_loc.x << ", " << ball_loc.y);
+    // Draw the ball position
+    cv::circle(cv_ptr->image, ball_loc, point_radius, cv::Scalar(0,0,255), -1);
 
-    cv::Point origin = cam_model_.project3dToPixel(cv::Point3d(0, 0, 100));
-
-    cv::circle(cv_ptr->image, origin, 2, cv::Scalar(0,255,0), -1);
-
-    // cv::Point3d ball_pos = cam_model_.projectPixelTo3dRay(ball_loc);
-    // ROS_INFO_STREAM("Ball Coordinates: " << ball_pos.x << ", " << ball_pos.y << ", " << ball_pos.z);
-
+    // Draw the FPS Counter
     cv::putText(cv_ptr->image, std::to_string(fps), cv::Point(0,30), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 1);
+
+    // Draw the Rod Bounding Boxes
+    cv::Scalar color;
+
+    if(def_state) color = cv::Scalar(0,255,0);
+    else color = cv::Scalar(255,0,0);
+
+    cv::rectangle(cv_ptr->image, def_rect, color, 2);
+
+    if(fwd_state) color = cv::Scalar(0,255,0);
+    else color = cv::Scalar(255,0,0);
+
+    cv::rectangle(cv_ptr->image, fwd_rect, color, 2);
 
     // Update GUI Window
     cv::imshow("Overhead Camera", cv_ptr->image);
 
     cv::waitKey(1);
-
-    // Output modified video stream
-    image_pub_.publish(cv_ptr->toImageMsg());
-
   }
 
   void ballPosCB(const geometry_msgs::Point& msg)
@@ -106,6 +110,21 @@ public:
     ball_loc.x = msg.x;
     ball_loc.y = msg.y;
   }
+
+  void defRodCB(const table_vision_sensing::RodState msg)
+  {
+    def_state = msg.rod_is_up;
+
+    def_rect = cv::Rect(msg.bounding_rect_img.x_offset, msg.bounding_rect_img.y_offset, msg.bounding_rect_img.width, msg.bounding_rect_img.height);
+  }
+
+  void fwdRodCB(const table_vision_sensing::RodState msg)
+  {
+    fwd_state = msg.rod_is_up;
+
+    fwd_rect = cv::Rect(msg.bounding_rect_img.x_offset, msg.bounding_rect_img.y_offset, msg.bounding_rect_img.width, msg.bounding_rect_img.height);
+  }
+
 
 };
 

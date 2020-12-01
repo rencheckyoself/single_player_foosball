@@ -8,7 +8,7 @@
   <node ns="camera" name="image_proc" pkg="image_proc" type="image_proc"/>
 
   <node if="$(arg view_image)" name="opencv_viewer" type="opencv_viewer" pkg="table_vision_sensing" output="screen">
-    <param name="point_radius" value="7"/> <!-- the radius of the dot of on the viewer -->
+    <param name="point_radius" value="3"/> <!-- the radius of the dot of on the viewer -->
   </node>
 
 </launch>

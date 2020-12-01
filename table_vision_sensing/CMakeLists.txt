@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   image_geometry
   image_transport
+	message_generation
   roscpp
   sensor_msgs
   std_msgs
@@ -55,11 +56,10 @@ find_package(OpenCV)
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+  FILES
+  RodState.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -76,10 +76,11 @@ find_package(OpenCV)
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+	sensor_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -111,8 +112,8 @@ find_package(OpenCV)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES table_vision_sensing
+ INCLUDE_DIRS include
+ LIBRARIES ${PROJECT_NAME}
  CATKIN_DEPENDS   cv_bridge geometry_msgs image_geometry image_transport roscpp sensor_msgs std_msgs
 #  DEPENDS system_lib
 )
@@ -124,20 +125,20 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+	include/${PROJECT_NAME}
   ${catkin_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/table_vision_sensing.cpp
-# )
+add_library(${PROJECT_NAME}
+  src/${PROJECT_NAME}/player_angle_detection.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
@@ -148,8 +149,7 @@ add_executable(${PROJECT_NAME}_background_removal src/background_removal.cpp)
 add_executable(${PROJECT_NAME}_cascade_classifier src/cascade_classifier.cpp)
 add_executable(${PROJECT_NAME}_training_image_capture src/training_image_capture.cpp)
 add_executable(${PROJECT_NAME}_opencv_viewer src/opencv_viewer.cpp)
-
-
+add_executable(${PROJECT_NAME}_player_tracking src/player_tracking.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -161,8 +161,7 @@ set_target_properties(${PROJECT_NAME}_background_removal PROPERTIES OUTPUT_NAME 
 set_target_properties(${PROJECT_NAME}_cascade_classifier PROPERTIES OUTPUT_NAME cascade_classifier PREFIX "")
 set_target_properties(${PROJECT_NAME}_training_image_capture PROPERTIES OUTPUT_NAME training_image_capture PREFIX "")
 set_target_properties(${PROJECT_NAME}_opencv_viewer PROPERTIES OUTPUT_NAME opencv_viewer PREFIX "")
-
-
+set_target_properties(${PROJECT_NAME}_player_tracking PROPERTIES OUTPUT_NAME player_tracking PREFIX "")
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
@@ -172,7 +171,7 @@ add_dependencies(${PROJECT_NAME}_background_removal ${${PROJECT_NAME}_EXPORTED_T
 add_dependencies(${PROJECT_NAME}_cascade_classifier ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(${PROJECT_NAME}_training_image_capture ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(${PROJECT_NAME}_opencv_viewer ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
+add_dependencies(${PROJECT_NAME}_player_tracking ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 
 ## Specify libraries to link a library or executable target against
@@ -206,6 +205,12 @@ target_link_libraries(${PROJECT_NAME}_opencv_viewer
 	${OpenCV_LIBRARIES}
 )
 
+target_link_libraries(${PROJECT_NAME}_player_tracking
+  ${catkin_LIBRARIES}
+	${OpenCV_LIBRARIES}
+	${PROJECT_NAME}
+)
+
 
 #############
 ## Install ##
@@ -223,24 +228,24 @@ target_link_libraries(${PROJECT_NAME}_opencv_viewer
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-install(TARGETS ${PROJECT_NAME}_ball_tracking ${PROJECT_NAME}_ball_tracking_eq ${PROJECT_NAME}_background_removal ${PROJECT_NAME}_cascade_classifier ${PROJECT_NAME}_training_image_capture ${PROJECT_NAME}_opencv_viewer
+install(TARGETS ${PROJECT_NAME}_ball_tracking ${PROJECT_NAME}_ball_tracking_eq ${PROJECT_NAME}_background_removal ${PROJECT_NAME}_cascade_classifier ${PROJECT_NAME}_training_image_capture ${PROJECT_NAME}_opencv_viewer ${PROJECT_NAME}_player_tracking
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 ## Mark libraries for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
-# install(TARGETS ${PROJECT_NAME}
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
-# )
+install(TARGETS ${PROJECT_NAME}
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
+)
 
 ## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-# )
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
+  PATTERN ".svn" EXCLUDE
+)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 install(DIRECTORY cascade_data/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/cascade_data)

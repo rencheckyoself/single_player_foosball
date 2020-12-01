@@ -8,4 +8,8 @@
 
   <node name="cascade_classifier" type="cascade_classifier" pkg="table_vision_sensing" output="screen"/>
 
+  <node name="player_tracking" type="player_tracking" pkg="table_vision_sensing" output="screen">
+    <rosparam command="load" file="$(find table_vision_sensing)/config/player_angle_detection.yaml"/>
+  </node>
+
 </launch>

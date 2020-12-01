@@ -1,5 +1,5 @@
 /// \file
-/// \brief a wrapper class to track the ball in world frame coordinates and predict the trajectory
+/// \brief a class to make game play decisions and move the table.
 #ifndef TABLEAI_INCLUDE_GUARD_HPP
 #define TABLEAI_INCLUDE_GUARD_HPP
 
@@ -9,7 +9,6 @@
 
 #include <opencv2/highgui/highgui.hpp>
 #include "table_motor_control/tic_server.hpp"
-
 
 namespace table
 {
@@ -22,19 +21,6 @@ namespace table
 
     /// \brief default constructor
     ControllerInfo() {};
-  };
-
-  /// \brief holds the parameters for detecting the angle of a rod
-  struct PlayerDetection
-  {
-    int roi_x; ///< ROI upper left hand corner pixel x coordinate
-    int roi_y; ///< ROI upper left hand corner pixel y coordinate
-    int roi_width; ///< ROI pixel width
-    int roi_height; ///< ROI pixel height
-
-    int area_limit; ///< threshold to filter out non_player contours
-    int end_kick_width; ///< the width of the rectangle fit to the player at the end of a kick
-    int end_kick_x; ///< the top left corner x coordinate of the rectangle fit to the player at the end of a kick
   };
 
   /// \brief struct to hold all of the calibration params for the table
@@ -53,9 +39,6 @@ namespace table
 
     double def_rod_xpos; ///< the x value (in world coordinates) of the ideal position for the defensive rod to strike the ball
     double fwd_rod_xpos; ///< the x value (in world coordinates) of the ideal position for the defensive rod to strike the ball
-
-    PlayerDetection fwd_rod; ///< angle detection params for the offensive rod
-    PlayerDetection def_rod; ///< angle detection params for the defensive rod
   };
 
   /// \brief a class to generate a control based on the state of the table
@@ -140,6 +123,8 @@ namespace table
     /// \brief energize the entire table
     void energize();
 
+
+
   private:
 
     /// \brief convert the joint states into absolute stepper positions and send the values to the tic controllers
@@ -149,6 +134,8 @@ namespace table
     tic_server::TicCtrlr def_lin;
     tic_server::TicCtrlr fwd_rot;
     tic_server::TicCtrlr fwd_lin;
+
+
   };
 }
 

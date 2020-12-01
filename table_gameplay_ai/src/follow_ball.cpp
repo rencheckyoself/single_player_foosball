@@ -69,25 +69,6 @@ int main(int argc, char** argv)
   np.getParam("def_rod_xpos", config.def_rod_xpos);
   np.getParam("fwd_rod_xpos", config.fwd_rod_xpos);
 
-  // Read in angle detection params
-  np.getParam("fwd/roi_x", config.fwd_rod.roi_x);
-  np.getParam("fwd/roi_y", config.fwd_rod.roi_y);
-  np.getParam("fwd/roi_width", config.fwd_rod.roi_width);
-  np.getParam("fwd/roi_height", config.fwd_rod.roi_height);
-
-  np.getParam("fwd/area_limit", config.fwd_rod.area_limit);
-  np.getParam("fwd/end_kick_width", config.fwd_rod.end_kick_width);
-  np.getParam("fwd/end_kick_x", config.fwd_rod.end_kick_x);
-
-  np.getParam("def/roi_x", config.def_rod.roi_x);
-  np.getParam("def/roi_y", config.def_rod.roi_y);
-  np.getParam("def/roi_width", config.def_rod.roi_width);
-  np.getParam("def/roi_height", config.def_rod.roi_height);
-
-  np.getParam("def/area_limit", config.def_rod.area_limit);
-  np.getParam("def/end_kick_width", config.def_rod.end_kick_width);
-  np.getParam("def/end_kick_x", config.def_rod.end_kick_x);
-
   ROS_INFO_STREAM("TICCMD: Forward Rotation ID: " << tic_info.fwd_rot_sn);
   ROS_INFO_STREAM("TICCMD: Forward Linear ID: " << tic_info.fwd_lin_sn);
   ROS_INFO_STREAM("TICCMD: Defense Rotation ID: " << tic_info.def_rot_sn);

@@ -18,8 +18,6 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/video/video.hpp>
 
-static const std::string OPENCV_WINDOW = "Image window";
-
 class ImageConverter
 {
   ros::NodeHandle nh_;
@@ -59,7 +57,7 @@ public:
       return;
     }
 
-    cv::Rect roi(50,30,150,180);
+    cv::Rect roi(320,280,150,180);
 
     cv::Mat cropped_img = cv_ptr->image(roi).clone();
 
@@ -68,7 +66,7 @@ public:
     cv::Mat detection_img;
 
     cv::Mat e_element = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5,5));
-    cv::Mat d_element = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(11,11));
+    cv::Mat d_element = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(7,7));
     cv::dilate(fgMask, detection_img, d_element);
     cv::erode(detection_img, detection_img, e_element);
 
@@ -90,7 +88,7 @@ public:
       }
     }
 
-    if(max_element >= 0 && max_area > 1500)
+    if(max_element >= 0 && max_area > 700)
     {
       cv::Rect boundRect = cv::boundingRect(contours[max_element]);
 
