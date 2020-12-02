@@ -103,17 +103,32 @@ Be sure that as the image coordinates are entered in to the .yaml file, they are
 
 ### Command Generation Configuration
 
+The two parameters that will most likely need adjusted are the `def_rod_xpos` and the `fwd_rod_xpos` in the `command_generation_config.yaml`. These parameters define the x position of the ideal location to strike the ball for each rod. In order to update these, use `start_game.launch` but leave the motors unpowered so the rods stay stationary. Position the player vertically and place the ball directly in front of a player and either use rviz or echo the `visualization_marker` topic to see the x position of the ball in the world coordinates. Record this value in the `command_generation_config.yaml` file for the automated defensive rod and the automated offensive rod.
+
+If you are using a different sized table, you will need to update the joint limits as well to account for linear travel of the rod. You may also want to update `table_params.yaml` in the `table_description` package in order to correct the visualization. For example, the rods on my table can travel 0.09m linearly. The urdf assumes the 0 position is in the middle so the joint limits will be at -0.45 and 0.45. For my table, 0.09m corresponds to roughly 240 steps to make the rod travel the full distance. When the game starts up, the gamplay node assumes the rod is already in 0 position. To make this easy to locate, I chose to have the lower step limit be the 0 position which makes the upper step limit 240.
+
+You can also modify the `linear_hysteresis` parameter to make the linear motion more or less sensitive to changes in the ball position.
+
 ### Player Angle Detection Configuration
+
+You may need to adjust the player angle detection parameters in `player_angle_detection.yaml` to account for your camera's position and calibration. Use the `start_tracking.launch` file with `view_image:=true` to display results of the player angle detection. First modify the roi_x and roi_y, roi_width, and roi_height so that the large red rectangles capture one of the players on the two automated rods.
+
+After the windows are properly aligned use rostopic echo to listen to the `\Def_RodState` and `\Fwd_RodState`. The player detection works using background subtraction, so in order use the detection the rod needs to move. Rotate the rod parallel to the table (like it just finished a kick) and slowly move it back and forth. Update `end_kick_x` value to a something a few less than the `min_x_value` shown on the topic and update `end_kick_width` to something a few less than the maximum `bounding_rect_img.width` value shown on the topic.
+
+If the bounding rectangle is not showing up when the player is moving, decrease `area_limit`. If small contours that are not part of the player are being detected, increase `area_limit`.
 
 ## How to Run:
 
-Position players in the assumed starting position.
+Position players in the assumed starting position, with the players feet down, perpendicular to the table with the rod against the wall closest to the motors.
 
-Switch button
+[insert image]
 
+Plug in the barrel jack, then plug it into the wall and flip the switch to turn on the table.
+
+Launch main launch file:
 `[insert proper launch command]`
 
-Throw ball onto table and play
+Throw ball onto table and play!
 
 ## Packages
 
@@ -144,13 +159,17 @@ This package is currently set up to follow the [ROS image_pipeline](http://wiki.
 
 Launch Files:
 - `start_ocam.launch`: Launch the camera and view the rectified image
-- `start_tracking.launch`: Use the trained cascade classifier to track the ball and view it
+- `start_tracking.launch`: Launch the ball and player tracking nodes. set view_image to true to view the output.
 - `capture_training_data.launch`: Launch everything to collect images to train the cascade classifier
 
 Nodes:
- - `cascade_classifier`: Use the trained cascade model to find and publish the ball's pixel location
+ - `ball_tracking`: Use the trained cascade model to find and publish the ball's pixel location
  - `opencv_viewer`: Listen to an image topic and display the image along with the ball position
+ - `player_tracking`: Use background subtraction and contour fitting to determine the approximate angle of the player.
  - `training_image_capture`: Listen to an image topic to collect data to train a cascade classifier
+
+Configuration:
+ - `player_angle_detection.yaml`: contains all of parameters to define the window to analyze and the parameters to detect if the players are raised and which side the feet are closest to.
 
 ### Gamplay
 This package is used as the main decision making pipeline based on the detected ball position and creates a joint state message that can be used by the urdf model for testing or converted to stepper commands using the `table_motor_control` package.

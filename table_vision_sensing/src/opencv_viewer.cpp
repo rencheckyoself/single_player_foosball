@@ -35,6 +35,7 @@ class ImageConverter
   cv::Point ball_loc;
 
   cv::Rect def_rect, fwd_rect;
+  cv::Rect def_window, fwd_window;
 
   bool def_state = false;
   bool fwd_state = false;
@@ -51,7 +52,6 @@ public:
     ball_pos_sub = n.subscribe("BallPosition", 1, &ImageConverter::ballPosCB, this);
     def_rect_sub = n.subscribe("Def_RodState", 1, &ImageConverter::defRodCB, this);
     fwd_rect_sub = n.subscribe("Fwd_RodState", 1, &ImageConverter::fwdRodCB, this);
-
 
     np.getParam("point_radius", point_radius);
 
@@ -99,6 +99,9 @@ public:
 
     cv::rectangle(cv_ptr->image, fwd_rect, color, 2);
 
+    cv::rectangle(cv_ptr->image, def_window, cv::Scalar(0,0,255), 2);
+    cv::rectangle(cv_ptr->image, fwd_window, cv::Scalar(0,0,255), 2);
+
     // Update GUI Window
     cv::imshow("Overhead Camera", cv_ptr->image);
 
@@ -116,6 +119,7 @@ public:
     def_state = msg.rod_is_up;
 
     def_rect = cv::Rect(msg.bounding_rect_img.x_offset, msg.bounding_rect_img.y_offset, msg.bounding_rect_img.width, msg.bounding_rect_img.height);
+    def_window = cv::Rect(msg.window_roi.x_offset, msg.window_roi.y_offset, msg.window_roi.width, msg.window_roi.height);
   }
 
   void fwdRodCB(const table_vision_sensing::RodState msg)
@@ -123,6 +127,7 @@ public:
     fwd_state = msg.rod_is_up;
 
     fwd_rect = cv::Rect(msg.bounding_rect_img.x_offset, msg.bounding_rect_img.y_offset, msg.bounding_rect_img.width, msg.bounding_rect_img.height);
+    fwd_window = cv::Rect(msg.window_roi.x_offset, msg.window_roi.y_offset, msg.window_roi.width, msg.window_roi.height);
   }
 
 

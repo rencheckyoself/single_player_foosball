@@ -1,6 +1,6 @@
 
-upper_joint_limit: 0.45 # the upper linear joint limit in meters. This should match the urdf linear joint limit
-lower_joint_limit: -0.45 # The lower linear joint limit in meters. This should match the urdf linear joint limit
+upper_joint_limit: 0.045 # the upper linear joint limit in meters. This should match the urdf linear joint limit
+lower_joint_limit: -0.045 # The lower linear joint limit in meters. This should match the urdf linear joint limit
 
 # since linear control is open loop, ensure players are positions at the 0 position on start up of the table
 upper_lin_steps: 240 # the upper linear joint limit for the actual stepper command

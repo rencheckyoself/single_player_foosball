@@ -144,21 +144,15 @@ add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EX
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(${PROJECT_NAME}_ball_tracking src/ball_tracking.cpp)
-add_executable(${PROJECT_NAME}_ball_tracking_eq src/ball_tracking_eq.cpp)
-add_executable(${PROJECT_NAME}_background_removal src/background_removal.cpp)
-add_executable(${PROJECT_NAME}_cascade_classifier src/cascade_classifier.cpp)
+add_executable(${PROJECT_NAME}_player_tracking src/player_tracking.cpp)
 add_executable(${PROJECT_NAME}_training_image_capture src/training_image_capture.cpp)
 add_executable(${PROJECT_NAME}_opencv_viewer src/opencv_viewer.cpp)
-add_executable(${PROJECT_NAME}_player_tracking src/player_tracking.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
 ## e.g. "rosrun someones_pkg node" instead of "rosrun someones_pkg someones_pkg_node"
 set_target_properties(${PROJECT_NAME}_ball_tracking PROPERTIES OUTPUT_NAME ball_tracking PREFIX "")
-set_target_properties(${PROJECT_NAME}_ball_tracking_eq PROPERTIES OUTPUT_NAME ball_tracking_eq PREFIX "")
-set_target_properties(${PROJECT_NAME}_background_removal PROPERTIES OUTPUT_NAME background_removal PREFIX "")
-set_target_properties(${PROJECT_NAME}_cascade_classifier PROPERTIES OUTPUT_NAME cascade_classifier PREFIX "")
 set_target_properties(${PROJECT_NAME}_training_image_capture PROPERTIES OUTPUT_NAME training_image_capture PREFIX "")
 set_target_properties(${PROJECT_NAME}_opencv_viewer PROPERTIES OUTPUT_NAME opencv_viewer PREFIX "")
 set_target_properties(${PROJECT_NAME}_player_tracking PROPERTIES OUTPUT_NAME player_tracking PREFIX "")
@@ -166,9 +160,6 @@ set_target_properties(${PROJECT_NAME}_player_tracking PROPERTIES OUTPUT_NAME pla
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 add_dependencies(${PROJECT_NAME}_ball_tracking ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(${PROJECT_NAME}_ball_tracking_eq ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(${PROJECT_NAME}_background_removal ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(${PROJECT_NAME}_cascade_classifier ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(${PROJECT_NAME}_training_image_capture ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(${PROJECT_NAME}_opencv_viewer ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(${PROJECT_NAME}_player_tracking ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -176,21 +167,6 @@ add_dependencies(${PROJECT_NAME}_player_tracking ${${PROJECT_NAME}_EXPORTED_TARG
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_ball_tracking
-  ${catkin_LIBRARIES}
-	${OpenCV_LIBRARIES}
-)
-
-target_link_libraries(${PROJECT_NAME}_ball_tracking_eq
-  ${catkin_LIBRARIES}
-	${OpenCV_LIBRARIES}
-)
-
-target_link_libraries(${PROJECT_NAME}_background_removal
-  ${catkin_LIBRARIES}
-	${OpenCV_LIBRARIES}
-)
-
-target_link_libraries(${PROJECT_NAME}_cascade_classifier
   ${catkin_LIBRARIES}
 	${OpenCV_LIBRARIES}
 )
@@ -228,7 +204,7 @@ target_link_libraries(${PROJECT_NAME}_player_tracking
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-install(TARGETS ${PROJECT_NAME}_ball_tracking ${PROJECT_NAME}_ball_tracking_eq ${PROJECT_NAME}_background_removal ${PROJECT_NAME}_cascade_classifier ${PROJECT_NAME}_training_image_capture ${PROJECT_NAME}_opencv_viewer ${PROJECT_NAME}_player_tracking
+install(TARGETS ${PROJECT_NAME}_ball_tracking ${PROJECT_NAME}_training_image_capture ${PROJECT_NAME}_opencv_viewer ${PROJECT_NAME}_player_tracking
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
