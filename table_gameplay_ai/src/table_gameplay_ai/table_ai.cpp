@@ -27,7 +27,7 @@ namespace table
   {
     // set linear positions
     joint_states.at(1) = getLinearPosition(ball_pos.y);
-    joint_states.at(3) = joint_states.at(0);
+    joint_states.at(3) = joint_states.at(1);
 
     // set angular positions
     joint_states.at(0) = getAngularPosition(ball_pos.x, config.def_rod_xpos);
@@ -54,11 +54,12 @@ namespace table
     // test if the position is valid
     if(!std::isnan(pos))
     {
-      if(pos > rod_x_coord - config.kick_trigger_threshold)
+      // check if the ball is within the threshold
+      if(pos > rod_x_coord - (2*config.kick_trigger_threshold) && pos < rod_x_coord + config.kick_trigger_threshold)
       {
-        if(pos > rod_x_coord + config.kick_trigger_threshold) return 0.5; // return an angle slightly back from vertical
-        else return -1.5; // tell the table to kick
+        return -1.5;
       }
+      else if(pos > rod_x_coord + config.kick_trigger_threshold) return 0.5; // return an angle slightly back from vertical
       else return 1.5; // fully raise players
     }
     else return 0; // position the players to be vertical
@@ -110,12 +111,38 @@ namespace table
       fwd_lin.set_position(lin_pos);
     }
 
+    if(def_reseting) joint_states.at(0) = 0.5;
+    if(fwd_reseting) joint_states.at(2) = 0.5;
+
+    if(std::floor(map_ranges(0.5, -3.14159, 3.14159, -100, 100)) == def_rot.get_current_pos())
+    {
+      def_reseting = false;
+    }
+
+    if(std::floor(map_ranges(0.5, -3.14159, 3.14159, -100, 100)) == fwd_rot.get_current_pos())
+    {
+      fwd_reseting = false;
+    }
+
+    if(std::floor(map_ranges(-1.5, -3.14159, 3.14159, -100, 100)) == def_rot.get_current_pos())
+    {
+      def_reseting = true;
+      joint_states.at(0) = 0.5;
+    }
+
+    if(std::floor(map_ranges(-1.5, -3.14159, 3.14159, -100, 100)) == fwd_rot.get_current_pos())
+    {
+      fwd_reseting = true;
+      joint_states.at(2) = 0.5;
+    }
+
     int def_rot_stepper = std::floor(map_ranges(joint_states.at(0), -3.14159, 3.14159, -100, 100));
     int fwd_rot_stepper = std::floor(map_ranges(joint_states.at(2), -3.14159, 3.14159, -100, 100));
 
     def_rot.set_position(def_rot_stepper);
     fwd_rot.set_position(fwd_rot_stepper);
   }
+
 
   void RealFoosballTable::energize()
   {

@@ -1,10 +1,13 @@
 <launch>
 
+  <arg name="view_image" default="true" doc="Display the overhead camera feed with tracking info"/>
+  <arg name="with_rviz" default="true" doc="Launched rviz if true"/>
+
   <include file="$(find table_vision_sensing)/launch/start_tracking.launch">
-    <arg name="view_image" value="True"/>
+    <arg name="view_image" value="$(arg view_image)"/>
   </include>
 
-  <node name="follow_ball" type="follow_ball" pkg="table_gameplay_ai" output="screen">
+  <node name="follow_ball" type="follow_ball" pkg="table_gameplay_ai" output="screen" required="true">
     <rosparam command="load" file="$(find table_gameplay_ai)/config/homography_config.yaml"/>
     <rosparam command="load" file="$(find table_gameplay_ai)/config/command_generation_config.yaml"/>
     <rosparam command="load" file="$(find table_motor_control)/config/motor_ids.yaml"/>
@@ -12,6 +15,7 @@
 
   <include file="$(find table_description)/launch/view_table.launch">
     <arg name="use_gui" value="False"/>
+    <arg name="with_rviz" value="$(arg with_rviz)"/>
   </include>
 
 </launch>

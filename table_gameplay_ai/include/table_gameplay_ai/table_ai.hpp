@@ -130,11 +130,13 @@ namespace table
     /// \brief convert the joint states into absolute stepper positions and send the values to the tic controllers
     void issueStepperControls();
 
+    bool def_reseting = false;
+    bool fwd_reseting = false;
+
     tic_server::TicCtrlr def_rot;
     tic_server::TicCtrlr def_lin;
     tic_server::TicCtrlr fwd_rot;
     tic_server::TicCtrlr fwd_lin;
-
 
   };
 }

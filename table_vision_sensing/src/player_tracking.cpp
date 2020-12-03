@@ -92,10 +92,10 @@ public:
     def_output.bounding_rect_img.width = def_state.boundRect.width;
     def_output.bounding_rect_img.height = def_state.boundRect.height;
 
-    def_output.window_roi.x_offset = def_state.boundRect.x + def_rod_params.roi_x;
-    def_output.window_roi.y_offset = def_state.boundRect.y + def_rod_params.roi_y;
-    def_output.window_roi.width = def_state.boundRect.width;
-    def_output.window_roi.height = def_state.boundRect.height;
+    def_output.window_roi.x_offset = def_rod_params.roi_x;
+    def_output.window_roi.y_offset = def_rod_params.roi_y;
+    def_output.window_roi.width = def_rod_params.roi_width;
+    def_output.window_roi.height = def_rod_params.roi_height;
 
     fwd_output.rod_is_up = fwd_state.rod_is_up;
     fwd_output.players_are_back = fwd_state.players_are_back;
@@ -106,10 +106,10 @@ public:
     fwd_output.bounding_rect_img.width = fwd_state.boundRect.width;
     fwd_output.bounding_rect_img.height = fwd_state.boundRect.height;
 
-    fwd_output.window_roi.x_offset = fwd_state.boundRect.x + fwd_rod_params.roi_x;
-    fwd_output.window_roi.y_offset = fwd_state.boundRect.y + fwd_rod_params.roi_y;
-    fwd_output.window_roi.width = fwd_state.boundRect.width;
-    fwd_output.window_roi.height = fwd_state.boundRect.height;
+    fwd_output.window_roi.x_offset = fwd_rod_params.roi_x;
+    fwd_output.window_roi.y_offset = fwd_rod_params.roi_y;
+    fwd_output.window_roi.width = fwd_rod_params.roi_width;
+    fwd_output.window_roi.height = fwd_rod_params.roi_height;
 
     def_state_pub.publish(def_output);
     fwd_state_pub.publish(fwd_output);
