@@ -124,22 +124,20 @@ opencv_traincascade -data ../cascade_data/ -vec ball.vec -bg background.dat -w 2
 ### Homography Calculation
 In order to transform the ball's image coordinates to world coordinates, the system needs to know some known pairs. So you will need to update the `homography_config.yaml` file in the `table_gameplay_ai/config` directory to adjust for the slight differences in the camera location. Included in that directory is a template corresponding to the world positions already listed in the `homography_config.yaml` file and an .stl for a stand that neatly fits into the circles on the template. Print out two copies of the template, attach them along the middle and and place it on the field.
 
-Then start up the ball tracking node, echo the `/BallPosition` topic in a separate terminal and record the average `(x,y)` pixel values in the `.yaml` file.
+Then start up the ball tracking node, echo the `/BallPosition` topic in a separate terminal and record the average `(x,y)` pixel values in the `.yaml` file. Be sure that as the image coordinates are entered in to the .yaml file, they are entered on the correct line.
 
 ```
 roslaunch table_vision_sensing start_tracking.launch view_image:=true
 rostopic echo /BallPosition
 ```
 
-[INSERT EXAMPLE PIC]
-
-Be sure that as the image coordinates are entered in to the .yaml file, they are entered on the correct line.
+<img src="table_description/img/homography_demo.jpg" width="300">
 
 ### Command Generation Configuration
 
-The two parameters that will most likely need adjusted are the `def_rod_xpos` and the `fwd_rod_xpos` in the `command_generation_config.yaml`. These parameters define the x position of the ideal location to strike the ball for each rod. In order to update these, use `start_game.launch` but leave the motors unpowered so the rods stay stationary. Position the player vertically and place the ball directly in front of a player and either use rviz or echo the `visualization_marker` topic to see the x position of the ball in the world coordinates. Record this value in the `command_generation_config.yaml` file for the automated defensive rod and the automated offensive rod.
+The two parameters that will most likely need adjusted are the `def_rod_xpos` and the `fwd_rod_xpos` in the `command_generation_config.yaml`. These parameters define the x position of the ideal location to strike the ball for each rod. In order to update these, use `start_game.launch` but leave the motors unpowered so the rods stay stationary. Position the players vertically and place the ball directly in front of a player. Either use rviz or echo the `visualization_marker` topic to see the x position of the ball in the world coordinates. Record this value in the `command_generation_config.yaml` file for the automated defensive rod and the automated offensive rod.
 
-If you are using a different sized table, you will need to update the joint limits as well to account for linear travel of the rod. You may also want to update `table_params.yaml` in the `table_description` package in order to correct the visualization. For example, the rods on my table can travel 0.09m linearly. The urdf assumes the 0 position is in the middle so the joint limits will be at -0.45 and 0.45. For my table, 0.09m corresponds to roughly 240 steps to make the rod travel the full distance. When the game starts up, the gamplay node assumes the rod is already in 0 position. To make this easy to locate, I chose to have the lower step limit be the 0 position which makes the upper step limit 240.
+If you are using a different sized table, you will need to update the joint limits as well to account for linear travel of the rod. You may also want to update `table_params.yaml` in the `table_description` package in order to correct the visualization. For example, the rods on my table can travel 0.09m linearly. The urdf assumes the 0 position is in the middle so the joint limits will be at -0.45 and 0.45. For my table, 0.09m corresponds to roughly 240 steps to make the rod travel the full distance. When the game starts up, the gameplay node assumes the rod is already in 0 position. I chose to have the lower stepper position limit be the 0 position which makes the upper stepper position limit 240.
 
 You can also modify the `linear_hysteresis` parameter to make the linear motion more or less sensitive to changes in the ball position.
 
@@ -147,20 +145,23 @@ You can also modify the `linear_hysteresis` parameter to make the linear motion 
 
 You may need to adjust the player angle detection parameters in `player_angle_detection.yaml` to account for your camera's position and calibration. Use the `start_tracking.launch` file with `view_image:=true` to display results of the player angle detection. First modify the roi_x and roi_y, roi_width, and roi_height so that the large red rectangles capture one of the players on the two automated rods.
 
-After the windows are properly aligned use rostopic echo to listen to the `\Def_RodState` and `\Fwd_RodState`. The player detection works using background subtraction, so in order use the detection the rod needs to move. Rotate the rod parallel to the table (like it just finished a kick) and slowly move it back and forth. Update `end_kick_x` value to a something a few less than the `min_x_value` shown on the topic and update `end_kick_width` to something a few less than the maximum `bounding_rect_img.width` value shown on the topic.
+After the windows are properly aligned use rostopic echo to listen to the `\Def_RodState` and `\Fwd_RodState`. The player detection works using background subtraction, so in order use the detection the rod needs to move. Rotate the rod parallel to the table (like it just finished a kick) and slowly move it back and forth. Update `end_kick_x` value to a something a few less than the `min_x_value` shown on the topic and update `end_kick_width` to something a few less than the maximum `bounding_rect_img.width` value shown on the   topic.
 
 If the bounding rectangle is not showing up when the player is moving, decrease `area_limit`. If small contours that are not part of the player are being detected, increase `area_limit`.
 
 ## How to Run:
 
-Position players in the assumed starting position, with the players feet down, perpendicular to the table with the rod against the wall closest to the motors.
+Position players in the assumed starting position: the players feet down, perpendicular to the table with the rod against the wall closest to the motors, like so:
 
-[insert image]
+<img src="table_description/img/starting_position.jpg" width="300">
 
-Plug in the barrel jack, then plug it into the wall and flip the switch to turn on the table.
+
+Plug in power supply to the barrel jack connector, then plug it into the wall and flip the switch to turn on the table.
 
 Launch main launch file:
-`[insert proper launch command]`
+```
+roslaunch table_gameplay_ai start_game.launch with_rviz:=false view_image:=false
+```
 
 Throw ball onto table and play!
 
@@ -171,6 +172,9 @@ This package provides a urdf model of the foosball table that can be displayed i
 
 Launch Files:
 - `view_table.launch`: Launch rviz and display the urdf along with the joint state publisher gui.
+  - use_gui, default: true. Set this to false to turn off the joint state publisher
+  - rviz_config, the location of the rviz configuration file
+  - with_rviz, default: true. Set to false to not launch rviz.
 
 Configuration:
 - `table_params.yaml`: measurements of the physical table. Changing these will update the urdf.
@@ -186,20 +190,25 @@ Nodes:
 
 Configuration:
 - `motor_ids.yaml`: contains all of the identifying information for each controller. This file must be updated with the serial numbers for your purchased boards.
-- `*_settings.txt`: these files contain the detailed settings for each of the motors. They were initially generated by exporting the settings using the ticgui. These files can be used to update the settings of a given tic while everything is running using the `*_update_settings` service offered by the `tic_cmd` node.
+- `*_settings.txt`: these files contain the detailed settings for each of the motors. They were initially generated by exporting the settings using the ticgui. These files can be used to update the settings of a given tic while everything is running using the `*_update_settings` service. The can also be uploaded using the ticgui tool.
 
 ### Vision
 This package is currently set up to follow the [ROS image_pipeline](http://wiki.ros.org/image_pipeline) structure. The `table_vision_sensing` package is set up to be camera agnostic, so feel free to use your own camera in place of the one linked in the parts list. You will need to modify the launch files to use your own camera.
 
 Launch Files:
 - `start_ocam.launch`: Launch the camera and view the rectified image
+  - view_image, default: false. Set this to false to the rectified image.
+  - show_ball_pos, default: true. Set this to false to not display a red dot for the ball position on the image feed.
+  - show_player_angle, default: true. Set to false to not display bounding rectangles for the player angle.
 - `start_tracking.launch`: Launch the ball and player tracking nodes. set view_image to true to view the output.
+  - view_image, default: false. Set this to false to the rectified image.
 - `capture_training_data.launch`: Launch everything to collect images to train the cascade classifier
+  - image_group, default: "ball". A string to use as the name for a directory of positive images.
 
 Nodes:
  - `ball_tracking`: Use the trained cascade model to find and publish the ball's pixel location
- - `opencv_viewer`: Listen to an image topic and display the image along with the ball position
- - `player_tracking`: Use background subtraction and contour fitting to determine the approximate angle of the player.
+ - `opencv_viewer`: Listen to an image topic and display the image along with the ball position and player angle info
+ - `player_tracking`: Use background subtraction and contour fitting to determine the approximate angle of the player
  - `training_image_capture`: Listen to an image topic to collect data to train a cascade classifier
 
 Configuration:
@@ -210,6 +219,8 @@ This package is used as the main decision making pipeline based on the detected 
 
 Launch Files:
 - `start_game.launch`: Launches everything to play a game of foosball against the table
+  - with_rviz, default: true. Set to false to not launch rviz.
+  - view_image, default: false. Set this to false to the rectified image.
 - `start_simulation.launch`: Uses the real ball position on the table, but does not actuate the real motors only the urdf model in rviz.
 
 Nodes:

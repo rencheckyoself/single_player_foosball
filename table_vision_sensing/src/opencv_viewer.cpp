@@ -46,8 +46,6 @@ class ImageConverter
 
   std::string video_name = "default";
 
-  VideoWriter output;
-
 public:
   ImageConverter() : it_(nh_)
   {
