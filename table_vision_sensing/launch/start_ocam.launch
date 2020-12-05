@@ -1,5 +1,7 @@
 <launch>
   <arg name="view_image" default="False" doc="Set to True to show the image from the camera on launch."/>
+  <arg name="show_ball_pos" default="true" doc="Displays a red dot on the most up to date ball position"/>
+  <arg name="show_player_angle" default="true" doc="Displays bounding rectangles defining the roi and the detected player."/>
 
   <include file="$(find ocam)/launch/ocam_ros.launch">
     <arg name="show_image" value="false"/> <!-- Show the raw, uncalibrated image -->
@@ -9,6 +11,8 @@
 
   <node if="$(arg view_image)" name="opencv_viewer" type="opencv_viewer" pkg="table_vision_sensing" output="screen">
     <param name="point_radius" value="3"/> <!-- the radius of the dot of on the viewer -->
+    <param name="show_ball_pos" value="$(arg show_ball_pos)"/>
+    <param name="show_player_angle" value="$(arg show_player_angle)"/> 
   </node>
 
 </launch>

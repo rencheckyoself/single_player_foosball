@@ -1,12 +1,12 @@
 <launch>
 
-  <arg name="image_group" default="positives" doc="The name of the subdirectory and info file to use for the images saved from a node."/>
+  <arg name="image_group" default="ball" doc="The name of the subdirectory and info file to use for the images saved from a node."/>
 
   <include file="$(find table_vision_sensing)/launch/start_ocam.launch"/>
 
   <node name="training_image_capture_BALL" type="training_image_capture" pkg="table_vision_sensing" output="screen">
     <param name="file_path" value="training_data/"/> <!-- relative to the package -->
-    <param name="image_group" value="ball"/> <!-- directory name to save the images in -->
+    <param name="image_group" value="$(arg image_group)"/> <!-- directory name to save the images in -->
     <param name="generate_annotation" value="false"/> <!-- specifies whether or not to add to the .dat for the image set. Set this to true for background image collection -->
   </node>
 

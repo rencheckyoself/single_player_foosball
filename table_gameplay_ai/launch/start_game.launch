@@ -18,4 +18,10 @@
     <arg name="with_rviz" value="$(arg with_rviz)"/>
   </include>
 
+  <node if="$(arg view_image)" name="opencv_viewer_raw" type="opencv_viewer" pkg="table_vision_sensing" output="screen">
+    <param name="point_radius" value="3"/> <!-- the radius of the dot of on the viewer -->
+    <param name="show_ball_pos" value="false"/>
+    <param name="show_player_angle" value="false"/>
+  </node>
+
 </launch>

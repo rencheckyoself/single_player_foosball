@@ -65,7 +65,7 @@ public:
     std::vector<double> weights;
     std::vector<int> levels;
 
-    ball_finder.detectMultiScale(cv_ptr->image, detected_balls, levels, weights, 1.1, 3, 0, cv::Size(), cv::Size(50,50), true);
+    ball_finder.detectMultiScale(cv_ptr->image, detected_balls, levels, weights, 1.4, 2, 0, cv::Size(), cv::Size(50,50), true);
 
     geometry_msgs::Point ball_loc;
 

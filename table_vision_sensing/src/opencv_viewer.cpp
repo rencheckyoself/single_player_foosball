@@ -1,4 +1,5 @@
 #include <vector>
+#include <string>
 
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
@@ -40,6 +41,13 @@ class ImageConverter
   bool def_state = false;
   bool fwd_state = false;
 
+  bool show_ball_pos = true;
+  bool show_player_angle = true;
+
+  std::string video_name = "default";
+
+  VideoWriter output;
+
 public:
   ImageConverter() : it_(nh_)
   {
@@ -54,6 +62,10 @@ public:
     fwd_rect_sub = n.subscribe("Fwd_RodState", 1, &ImageConverter::fwdRodCB, this);
 
     np.getParam("point_radius", point_radius);
+    np.getParam("show_ball_pos", show_ball_pos);
+    np.getParam("show_player_angle", show_player_angle);
+    np.getParam("video_name", video_name);
+
 
     current_frame_time = ros::Time::now();
     last_frame_time = ros::Time::now();
@@ -80,27 +92,31 @@ public:
     int fps = 1.0 / (msg->header.stamp - last_frame_time).toSec();
     last_frame_time = msg->header.stamp;
 
-    // Draw the ball position
-    cv::circle(cv_ptr->image, ball_loc, point_radius, cv::Scalar(0,0,255), -1);
-
     // Draw the FPS Counter
     cv::putText(cv_ptr->image, std::to_string(fps), cv::Point(0,30), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 1);
 
+    // Draw the ball position
+    if(show_ball_pos) cv::circle(cv_ptr->image, ball_loc, point_radius, cv::Scalar(0,0,255), -1);
+
     // Draw the Rod Bounding Boxes
-    cv::Scalar color;
 
-    if(def_state) color = cv::Scalar(0,255,0);
-    else color = cv::Scalar(255,0,0);
+    if(show_player_angle)
+    {
+      cv::Scalar color;
 
-    cv::rectangle(cv_ptr->image, def_rect, color, 2);
+      if(def_state) color = cv::Scalar(0,255,0);
+      else color = cv::Scalar(255,0,0);
 
-    if(fwd_state) color = cv::Scalar(0,255,0);
-    else color = cv::Scalar(255,0,0);
+      cv::rectangle(cv_ptr->image, def_rect, color, 2);
 
-    cv::rectangle(cv_ptr->image, fwd_rect, color, 2);
+      if(fwd_state) color = cv::Scalar(0,255,0);
+      else color = cv::Scalar(255,0,0);
 
-    cv::rectangle(cv_ptr->image, def_window, cv::Scalar(0,0,255), 2);
-    cv::rectangle(cv_ptr->image, fwd_window, cv::Scalar(0,0,255), 2);
+      cv::rectangle(cv_ptr->image, fwd_rect, color, 2);
+
+      cv::rectangle(cv_ptr->image, def_window, cv::Scalar(0,0,255), 2);
+      cv::rectangle(cv_ptr->image, fwd_window, cv::Scalar(0,0,255), 2);
+    }
 
     // Update GUI Window
     cv::imshow("Overhead Camera", cv_ptr->image);
