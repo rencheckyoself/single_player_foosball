@@ -6,13 +6,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(DEFAULT_BUILD_TYPE "Debug") # build type to default to
-
-if(NOT _CMAKE_BUILD_TYPE)        # If no build type is set, set one
-  set(${PROJECT_NAME}_CMAKE_BUILD_TYPE ${DEFAULT_BUILD_TYPE} CACHE
-    STRING "Type of build." FORCE)
-endif()
-
 set(ticAPI_INCLUDE_DIRS /usr/local/include/libpololu-tic-1)
 set(ticAPI_LIBRARIES /usr/local/lib/libpololu-tic-1.so)
 
@@ -115,7 +108,7 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
- INCLUDE_DIRS include/${PROJECT_NAME}
+ INCLUDE_DIRS include
  LIBRARIES ${PROJECT_NAME}
  CATKIN_DEPENDS message_generation roscpp std_msgs std_srvs
 #  DEPENDS system_lib
@@ -169,7 +162,6 @@ add_dependencies(${PROJECT_NAME}_tic_cmd ${${PROJECT_NAME}_EXPORTED_TARGETS} ${c
 target_link_libraries(${PROJECT_NAME}_tic_cmd
   ${catkin_LIBRARIES}
 	${PROJECT_NAME}
-	${ticAPI_LIBRARIES}
 )
 
 #############
@@ -188,8 +180,7 @@ target_link_libraries(${PROJECT_NAME}_tic_cmd
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-install(TARGETS
-	${PROJECT_NAME}_tic_cmd
+install(TARGETS ${PROJECT_NAME}_tic_cmd
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

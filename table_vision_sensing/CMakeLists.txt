@@ -114,7 +114,7 @@ generate_messages(
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES ${PROJECT_NAME}
- CATKIN_DEPENDS   cv_bridge geometry_msgs image_geometry image_transport roscpp sensor_msgs std_msgs
+ CATKIN_DEPENDS  cv_bridge geometry_msgs image_geometry image_transport roscpp sensor_msgs std_msgs
 #  DEPENDS system_lib
 )
 

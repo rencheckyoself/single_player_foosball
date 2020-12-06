@@ -41,6 +41,17 @@ namespace tic_server
     handle.set_target_position(val);
   }
 
+  bool TicCtrlr::set_velocity(table_motor_control::Int32::Request &req, table_motor_control::Int32::Response &)
+  {
+    set_position(req.data);
+    return 1;
+  }
+
+  void TicCtrlr::set_velocity(int32_t val)
+  {
+    handle.set_target_velocity(val);
+  }
+
   bool TicCtrlr::reset_global_position(std_srvs::Empty::Request &, std_srvs::Empty::Response &)
   {
     reset_global_position();
@@ -60,7 +71,9 @@ namespace tic_server
   void TicCtrlr::import_settings()
   {
     // get file and convert it to a string
-    std::ifstream ifs("/home/michaelrencheck/FinalProject/src/table_motor_control/config/" + nickname + "_settings.txt");
+    std::string package_path;
+    package_path = ros::package::getPath("table_vision_sensing");
+    std::ifstream ifs(package_path + "/config/" + nickname + "_settings.txt");
     std::string content((std::istreambuf_iterator<char>(ifs) ), (std::istreambuf_iterator<char>() ));
 
     // Check if the file was not found
@@ -68,10 +81,11 @@ namespace tic_server
     {
       std::cout << "Tic Settings file was not found." << std::endl;
     }
-
-    tic::settings s = tic::settings::read_from_string(content);
-
-    handle.set_settings(s);
+    else
+    {
+      tic::settings s = tic::settings::read_from_string(content);
+      handle.set_settings(s);
+    }
   }
 
   bool TicCtrlr::import_settings(std_srvs::Empty::Request&, std_srvs::Empty::Response&)

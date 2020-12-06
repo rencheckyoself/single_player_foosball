@@ -1,6 +1,8 @@
 #include <vector>
+#include <string>
 
 #include <ros/ros.h>
+#include <ros/package.h>
 #include <image_transport/image_transport.h>
 
 #include <sensor_msgs/image_encodings.h>
@@ -35,8 +37,10 @@ public:
 
     ball_pos = n.advertise<geometry_msgs::Point>("BallPosition", 1);
 
+    std::string package_path = ros::package::getPath("table_vision_sensing");
+
     // Load the trained model
-    if(!ball_finder.load("/home/michaelrencheck/FinalProject/src/table_vision_sensing/cascade_data/cascade.xml"))
+    if(!ball_finder.load(package_path + "/cascade_data/cascade.xml"))
     {
       ROS_ERROR_STREAM("Cascade not loaded properly");
       ros::shutdown();

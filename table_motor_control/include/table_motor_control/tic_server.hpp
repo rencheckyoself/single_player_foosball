@@ -4,10 +4,12 @@
 #define TIC_SERVER_INCLUDE_GUARD_HPP
 
 #include <ros/ros.h>
+#include <ros/package.h>
 #include <std_srvs/Empty.h>
 
 #include <stdint.h>
 #include <iostream>
+#include <string>
 
 #include "tic.hpp"
 #include "table_motor_control/Int32.h"
@@ -44,6 +46,16 @@ namespace tic_server
     /// \brief send the stepper a target position
     /// \param val an absolute position value in number of steps to move.
     void set_position(int32_t val);
+
+    /// \brief callback service wrapper function to send the motor to a target velocity
+    /// \param req service request data is only an int32
+    /// \param res no response
+    /// \returns 1 for success, 0 for failure
+    bool set_velocity(table_motor_control::Int32::Request &req, table_motor_control::Int32::Response &);
+
+    /// \brief send the stepper a target position
+    /// \param val velocity in pulses/s to move.
+    void set_velocity(int32_t val);
 
     /// \brief callback service wrapper function to reset the 0 absolute position
     /// \param req no request

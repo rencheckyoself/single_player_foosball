@@ -182,7 +182,7 @@ public:
     another->mouse_callback(event, x, y, flag);
   }
 
-  void mouse_callback(int event, int x, int y, int flag)
+  void mouse_callback(int event, int x, int y, int)
   {
 
       if (event == cv::EVENT_LBUTTONDOWN)
