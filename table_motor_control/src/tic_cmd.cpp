@@ -22,7 +22,6 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "tic_cmd");
   ros::NodeHandle np("~");
-  ros::NodeHandle n;
 
   std::string fwd_rot_sn, fwd_lin_sn, def_rot_sn, def_lin_sn;
   std::string fwd_rot_nickname, fwd_lin_nickname, def_rot_nickname, def_lin_nickname;
@@ -55,10 +54,10 @@ int main(int argc, char** argv)
   tic_server::TicCtrlr def_rot(def_rot_sn, def_rot_nickname);
   tic_server::TicCtrlr def_lin(def_lin_sn, def_lin_nickname);
 
-  fwd_rot.offer_services(n);
-  fwd_lin.offer_services(n);
-  def_rot.offer_services(n);
-  def_lin.offer_services(n);
+  fwd_rot.offer_services();
+  fwd_lin.offer_services();
+  def_rot.offer_services();
+  def_lin.offer_services();
 
   ros::spin();
 

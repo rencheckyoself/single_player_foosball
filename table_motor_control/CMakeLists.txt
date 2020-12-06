@@ -115,7 +115,7 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
- INCLUDE_DIRS include
+ INCLUDE_DIRS include/${PROJECT_NAME}
  LIBRARIES ${PROJECT_NAME}
  CATKIN_DEPENDS message_generation roscpp std_msgs std_srvs
 #  DEPENDS system_lib
@@ -136,7 +136,6 @@ include_directories(
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
   src/${PROJECT_NAME}/tic_server.cpp
-	src/${PROJECT_NAME}/location_conversion.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

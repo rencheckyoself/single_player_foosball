@@ -28,9 +28,8 @@ namespace tic_server
     /// \param name a unique readable nickename for the tic controller
     TicCtrlr(std::string desired_serial_number, std::string name);
 
-    /// \brief Initialize all of the services to offer expose functionality to user and other nodes
-    /// \param n reference to a node handle
-    void offer_services(ros::NodeHandle &n);
+    /// \brief Initialize all of the services to offer expose functionality to user
+    void offer_services();
 
     /// \brief get the current position of the stepper
     /// \returns the integer position for where the controller thinks the stepper is
@@ -101,6 +100,8 @@ namespace tic_server
     ros::ServiceServer reset_home_service; ///< stops the motor and sets the current position as the 0 position
     ros::ServiceServer resume_service; ///< turns the motor on
     ros::ServiceServer deenergize_service; ///< turns the motor off
+
+    ros::NodeHandle n; ///< node handle to offer services.
   };
 }
 

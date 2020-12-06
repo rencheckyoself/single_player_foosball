@@ -14,11 +14,11 @@ namespace tic_server
     handle = TicCtrlr::open_handle(desired_serial_number);
     serial_number = desired_serial_number;
     nickname = name;
+    settings_service = n.advertiseService(nickname + "_update_settings", &TicCtrlr::import_settings, this);
   }
 
-  void TicCtrlr::offer_services(ros::NodeHandle &n)
+  void TicCtrlr::offer_services()
   {
-    settings_service = n.advertiseService(nickname + "_update_settings", &TicCtrlr::import_settings, this);
     target_service = n.advertiseService(nickname + "_set_target_pos", &TicCtrlr::set_position, this);
     reset_home_service = n.advertiseService(nickname + "_reset_current_pos", &TicCtrlr::reset_global_position, this);
     resume_service = n.advertiseService(nickname + "_resume", &TicCtrlr::resume, this);
@@ -38,7 +38,6 @@ namespace tic_server
 
   void TicCtrlr::set_position(int32_t val)
   {
-    // handle.halt_and_hold();
     handle.set_target_position(val);
   }
 
