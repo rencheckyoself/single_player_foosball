@@ -19,6 +19,7 @@ namespace tic_server
 
   void TicCtrlr::offer_services()
   {
+    velocity_service = n.advertiseService(nickname + "_set_target_velocity", &TicCtrlr::set_velocity, this); 
     target_service = n.advertiseService(nickname + "_set_target_pos", &TicCtrlr::set_position, this);
     reset_home_service = n.advertiseService(nickname + "_reset_current_pos", &TicCtrlr::reset_global_position, this);
     resume_service = n.advertiseService(nickname + "_resume", &TicCtrlr::resume, this);

@@ -38,8 +38,10 @@ class ImageConverter
   cv::Rect def_rect, fwd_rect;
   cv::Rect def_window, fwd_window;
 
-  bool def_state = false;
-  bool fwd_state = false;
+  bool def_up = false;
+  bool def_back = false;
+  bool fwd_up = false;
+  bool fwd_back = false;
 
   bool show_ball_pos = true;
   bool show_player_angle = true;
@@ -102,18 +104,20 @@ public:
     {
       cv::Scalar color;
 
-      if(def_state) color = cv::Scalar(0,255,0);
+      if(def_up) color = cv::Scalar(0,255,0);
+      else if(def_up && def_back) color = cv::Scalar(0,0,255);
       else color = cv::Scalar(255,0,0);
 
       cv::rectangle(cv_ptr->image, def_rect, color, 2);
 
-      if(fwd_state) color = cv::Scalar(0,255,0);
+      if(fwd_up) color = cv::Scalar(0,255,0);
+      else if(fwd_up && fwd_back) color = cv::Scalar(0,0,255);
       else color = cv::Scalar(255,0,0);
 
       cv::rectangle(cv_ptr->image, fwd_rect, color, 2);
 
-      cv::rectangle(cv_ptr->image, def_window, cv::Scalar(0,0,255), 2);
-      cv::rectangle(cv_ptr->image, fwd_window, cv::Scalar(0,0,255), 2);
+      cv::rectangle(cv_ptr->image, def_window, cv::Scalar(255,255,255), 2);
+      cv::rectangle(cv_ptr->image, fwd_window, cv::Scalar(255,255,255), 2);
     }
 
     // Update GUI Window
@@ -130,7 +134,8 @@ public:
 
   void defRodCB(const table_vision_sensing::RodState msg)
   {
-    def_state = msg.rod_is_up;
+    def_up = msg.rod_is_up;
+    def_back = msg.players_are_back;
 
     def_rect = cv::Rect(msg.bounding_rect_img.x_offset, msg.bounding_rect_img.y_offset, msg.bounding_rect_img.width, msg.bounding_rect_img.height);
     def_window = cv::Rect(msg.window_roi.x_offset, msg.window_roi.y_offset, msg.window_roi.width, msg.window_roi.height);
@@ -138,7 +143,8 @@ public:
 
   void fwdRodCB(const table_vision_sensing::RodState msg)
   {
-    fwd_state = msg.rod_is_up;
+    fwd_up = msg.rod_is_up;
+    fwd_back = msg.players_are_back;
 
     fwd_rect = cv::Rect(msg.bounding_rect_img.x_offset, msg.bounding_rect_img.y_offset, msg.bounding_rect_img.width, msg.bounding_rect_img.height);
     fwd_window = cv::Rect(msg.window_roi.x_offset, msg.window_roi.y_offset, msg.window_roi.width, msg.window_roi.height);

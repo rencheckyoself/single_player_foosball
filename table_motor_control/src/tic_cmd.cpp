@@ -11,6 +11,7 @@
 /// SERIVCES:
 
 #include <ros/ros.h>
+#include <ros/package.h>
 
 #include <iostream>
 #include <tic.hpp>

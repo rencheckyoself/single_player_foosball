@@ -15,6 +15,7 @@ set(ticAPI_LIBRARIES /usr/local/lib/libpololu-tic-1.so)
 find_package(catkin REQUIRED COMPONENTS
 	message_generation
 	roscpp
+	roslib
 	std_msgs
   std_srvs
 )
@@ -134,6 +135,7 @@ add_library(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
 	${catkin_LIBRARIES}
 	${ticAPI_LIBRARIES}
+	${roslib_LIBRARIES}
 )
 
 ## Add cmake target dependencies of the library
@@ -163,6 +165,8 @@ target_link_libraries(${PROJECT_NAME}_tic_cmd
   ${catkin_LIBRARIES}
 	${PROJECT_NAME}
 )
+
+# message(STATUS "foo include dir: ${catkin_LIBRARIES}")
 
 #############
 ## Install ##

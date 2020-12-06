@@ -169,11 +169,13 @@ add_dependencies(${PROJECT_NAME}_player_tracking ${${PROJECT_NAME}_EXPORTED_TARG
 target_link_libraries(${PROJECT_NAME}_ball_tracking
   ${catkin_LIBRARIES}
 	${OpenCV_LIBRARIES}
+  ${roslib_LIBRARIES}
 )
 
 target_link_libraries(${PROJECT_NAME}_training_image_capture
   ${catkin_LIBRARIES}
 	${OpenCV_LIBRARIES}
+  ${roslib_LIBRARIES}
 )
 
 target_link_libraries(${PROJECT_NAME}_opencv_viewer

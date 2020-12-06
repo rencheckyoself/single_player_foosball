@@ -109,6 +109,7 @@ namespace tic_server
 
     ros::ServiceServer settings_service; ///< service to update a tic controllers settings
     ros::ServiceServer target_service; ///< service to send an absolute position command
+    ros::ServiceServer velocity_service; ///< service to send a velocity command
     ros::ServiceServer reset_home_service; ///< stops the motor and sets the current position as the 0 position
     ros::ServiceServer resume_service; ///< turns the motor on
     ros::ServiceServer deenergize_service; ///< turns the motor off
