@@ -1,6 +1,6 @@
 # Single Player Foosball Table
 
-## Michael Rencheck
+<img src="table_description/img/overview.jpg" width="600">
 
 ## Dependencies
 The following are other software packages required to run the software for the table:
