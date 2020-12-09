@@ -37,6 +37,10 @@ namespace tic_server
     /// \returns the integer position for where the controller thinks the stepper is
     int32_t get_current_pos();
 
+    /// \brief get the max speed limit of the stepper
+    /// \returns the absolute value max speed
+    int32_t get_max_speed();
+
     /// \brief callback service wrapper function to send the motor to a target position
     /// \param req service request data is only an int32
     /// \param res no response

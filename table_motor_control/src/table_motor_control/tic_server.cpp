@@ -19,7 +19,7 @@ namespace tic_server
 
   void TicCtrlr::offer_services()
   {
-    velocity_service = n.advertiseService(nickname + "_set_target_velocity", &TicCtrlr::set_velocity, this); 
+    velocity_service = n.advertiseService(nickname + "_set_target_velocity", &TicCtrlr::set_velocity, this);
     target_service = n.advertiseService(nickname + "_set_target_pos", &TicCtrlr::set_position, this);
     reset_home_service = n.advertiseService(nickname + "_reset_current_pos", &TicCtrlr::reset_global_position, this);
     resume_service = n.advertiseService(nickname + "_resume", &TicCtrlr::resume, this);
@@ -29,6 +29,11 @@ namespace tic_server
   int32_t TicCtrlr::get_current_pos()
   {
     return handle.get_variables().get_current_position();
+  }
+
+  int32_t TicCtrlr::get_max_speed()
+  {
+    return handle.get_variables().get_max_speed();
   }
 
   bool TicCtrlr::set_position(table_motor_control::Int32::Request &req, table_motor_control::Int32::Response &)

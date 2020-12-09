@@ -14,6 +14,9 @@
 namespace tracking
 {
 
+  /// \brief describes the state of the rod. Back is raised with feet closest to own goal, Neutral is not raised, Up is raised with feet closest to opponent goal
+  enum rod_angle {BACK, NEUTRAL, UP};
+
   /// \brief holds the parameters for detecting the angle of a rod
   struct PlayerDetectionParams
   {

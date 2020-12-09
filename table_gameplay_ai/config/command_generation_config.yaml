@@ -2,8 +2,7 @@
 upper_joint_limit: 0.045 # the upper linear joint limit in meters. This should match the urdf linear joint limit
 lower_joint_limit: -0.045 # The lower linear joint limit in meters. This should match the urdf linear joint limit
 
-# since linear control is open loop, ensure players are positions at the 0 position on start up of the table
-upper_lin_steps: 240 # the upper linear joint limit for the actual stepper command
+upper_lin_steps: 230 # the upper linear joint limit for the actual stepper command
 lower_lin_steps: 0 # the lower linear joint limit for the actual stepper command
 
 linear_hysteresis: 10 # the smaller the value the more sensative the linear position command generation will be
@@ -12,3 +11,5 @@ kick_trigger_threshold: 0.015 # in meters, defines the +/- threshold to trigger 
 
 def_rod_xpos: 0.067 # the x value (in world coordinates) of the ideal position for the defensive rod to strike the ball
 fwd_rod_xpos: 0.257 # the x value (in world coordinates) of the ideal position for the offensive rod to strike the ball
+
+velocity_modifier: 0.55 # a value from 0 < x <= 1, scales the maximum velocity setting without changing the value in the controller settings.

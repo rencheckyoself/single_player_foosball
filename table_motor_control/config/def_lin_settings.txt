@@ -27,8 +27,8 @@ input_min: 0
 input_neutral_min: 2015
 input_neutral_max: 2080
 input_max: 4095
-output_min: -200
-output_max: 200
+output_min: 0
+output_max: 240
 encoder_prescaler: 1
 encoder_postscaler: 1
 encoder_unlimited: false

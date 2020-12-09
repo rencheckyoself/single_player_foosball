@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
 	table_motor_control
+	table_vision_sensing
 )
 
 find_package(OpenCV)
@@ -136,6 +137,13 @@ add_library(${PROJECT_NAME}
 	src/${PROJECT_NAME}/table_ai.cpp
 )
 
+target_link_libraries(${PROJECT_NAME}
+	PUBLIC ${catkin_LIBRARIES}
+	PUBLIC ${OpenCV_LIBRARIES}
+	PUBLIC ${table_motor_control_LIBRARIES}
+	PUBLIC ${table_vision_sensing_LIBRARIES}
+)
+
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
@@ -165,9 +173,7 @@ add_dependencies(${PROJECT_NAME}_follow_ball ${${PROJECT_NAME}_EXPORTED_TARGETS}
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_follow_ball
   ${catkin_LIBRARIES}
-  ${OpenCV_LIBRARIES}
 	${PROJECT_NAME}
-  ${table_motor_control_LIBRARIES}
 )
 
 # target_link_libraries(${PROJECT_NAME}_simulation_game
