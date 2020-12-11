@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# get Tic Library and Directory
 set(ticAPI_INCLUDE_DIRS /usr/local/include/libpololu-tic-1)
 set(ticAPI_LIBRARIES /usr/local/lib/libpololu-tic-1.so)
 

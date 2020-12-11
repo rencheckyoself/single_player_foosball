@@ -1,11 +1,18 @@
 /// \file
 /// \brief Node to subsribe to commands and send them to the Tic's. Also offers services for manual control.
 /// PARAMETERS:
+///   table_gameplay_ai/config/homography_config.yaml
+///   table_gameplay_ai/config/command_generation_config.yaml
+///   table_motor_control/config/motor_ids.yaml
 /// PUBLISHES:
-///
+///   /joint_states (sensor_msgs/JointState) A joint state message for visualization in rviz
+///   /visualization_marker (visualization_msgs/Marker) A marker to show the balls position in world coordinates
 /// SUBSCRIBES:
-///
+///   /BallPosition (geometry_msgs/Point) The image coordinates of the ball
+///   /Def_RodState (table_vision_sensing/RosState) Rod state information for the defensive rod
+///   /Fwd_RodState (table_vision_sensing/RosState) Rod state information for the offensive rod
 /// SERIVCES:
+///   /*_update_settings (std_msgs/Empty) services to update the settings of the Tic Controllers.
 
 #include <utility>
 #include <memory>
@@ -22,14 +29,18 @@
 #include "ball_prediction.hpp"
 #include "table_ai.hpp"
 
-static tracking::RodState fwd_rod_state, def_rod_state;
+static tracking::RodState fwd_rod_state, def_rod_state; ///< store the most recent rod state information
 
+/// \brief Callback for the forward rod state suscriber
+/// \param msg rod state information
 void forwardRodCB(table_vision_sensing::RodState msg)
 {
   fwd_rod_state.rod_is_up = msg.rod_is_up;
   fwd_rod_state.players_are_back = msg.players_are_back;
 }
 
+/// \brief Callback for the forward rod state suscriber
+/// \param msg rod state information
 void defenseRodCB(table_vision_sensing::RodState msg)
 {
   def_rod_state.rod_is_up = msg.rod_is_up;
@@ -37,6 +48,9 @@ void defenseRodCB(table_vision_sensing::RodState msg)
 }
 
 /// \brief main function to create the real_waypoints node
+/// \param argc argument count
+/// \param arguments
+/// \returns success
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "follow_ball");
@@ -59,6 +73,7 @@ int main(int argc, char** argv)
 
   int mode;
 
+  // Read in mode
   np.getParam("mode", mode);
 
   // Read in homography configuration
@@ -111,15 +126,18 @@ int main(int argc, char** argv)
   ROS_INFO_STREAM("TICCMD: Defense Linear Name: " << tic_info.def_lin_nickname);
   ROS_INFO_STREAM("TICCMD: Defense Linear ID: " << tic_info.def_lin_sn);
 
+  // convert coordinate data to different data type
   std::vector<std::vector<double>> wc = tracking::parse_points_data(world_coordinates);
   std::vector<std::vector<double>> ic = tracking::parse_points_data(image_coordinates);
 
+  // initialize ball tracking
   tracking::BallTracker foosball(0, wc, ic, error_threshold);
   foosball.testExtrinsicResults();
 
   config.xrange = foosball.getXRange();
   config.yrange = foosball.getYRange();
 
+  // Create gameplay class based on the mode selected
   std::unique_ptr<table::RealFoosballTable> robot_player;
 
   switch(mode)
@@ -146,22 +164,26 @@ int main(int argc, char** argv)
     }
   }
 
-  ros::Rate r(100);
-
+  // initialize joint state message
   sensor_msgs::JointState joint_msg;
   std::vector<std::string> joint_names = {"white_attack_rot_joint", "white_attack_lin_joint", "white_goalie_rot_joint", "white_goalie_lin_joint", "grey_attack_rot_joint", "grey_attack_lin_joint", "grey_goalie_rot_joint", "grey_goalie_lin_joint"};
   joint_msg.name = joint_names;
 
+  // initialize ball marker messageS
   visualization_msgs::Marker ball_marker;
   ball_marker.header.frame_id = "field";
+
+  ros::Rate r(100);
 
   while(ros::ok())
   {
     // Get the position of the ball
     cv::Point3d pos = foosball.getWorldPosition();
 
+    // generate the control and issue the commands
     robot_player->moveTable(pos, fwd_rod_state, def_rod_state);
 
+    // build the joint state message
     std::vector<double> joint_vals = robot_player->getCurrentJointStates();
 
     joint_msg.header.stamp = ros::Time::now();
@@ -169,6 +191,7 @@ int main(int argc, char** argv)
 
     joint_pub.publish(joint_msg);
 
+    // build the marker message
     ball_marker.header.stamp = ros::Time::now();
     ball_marker.id = 0;
     ball_marker.type = visualization_msgs::Marker::SPHERE;
@@ -196,5 +219,6 @@ int main(int argc, char** argv)
 
     r.sleep();
   }
+
   return 0;
 }

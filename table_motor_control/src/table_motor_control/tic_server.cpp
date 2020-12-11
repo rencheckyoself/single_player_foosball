@@ -1,17 +1,10 @@
-/// \file
-/// \brief a wrapper class to interact with Tic C++ API and manage service callbacks
-
-#include <iostream>
-#include <fstream>
-#include <tic.hpp>
-
 #include "tic_server.hpp"
 
 namespace tic_server
 {
   TicCtrlr::TicCtrlr(std::string desired_serial_number, std::string name)
   {
-    handle = TicCtrlr::open_handle(desired_serial_number);
+    handle = TicCtrlr::open_handle(desired_serial_number); // Initialize the controller
     serial_number = desired_serial_number;
     nickname = name;
     settings_service = n.advertiseService(nickname + "_update_settings", &TicCtrlr::import_settings, this);

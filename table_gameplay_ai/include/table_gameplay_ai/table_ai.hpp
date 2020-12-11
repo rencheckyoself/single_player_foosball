@@ -46,12 +46,14 @@ namespace table
     int def_reset_offset; ///< number of steps to rotate backward to reset after a kick.
     int fwd_reset_offset; ///< number of steps to rotate backward to reset after a kick.
     int full_rotation_offset; ///< number of steps to complete a full rotation.
+
+    /// \brief default constructor
+    CalibrationVals() {};
   };
 
   /// \brief a class to generate a control based on the state of the table
   class FoosballTable
   {
-
   public:
 
     /// \brief Default constructor
@@ -104,7 +106,7 @@ namespace table
     CalibrationVals config; ///< all of the configuration parameters to properly generate the controls
   };
 
-  /// \brief This class implements fully open loop gameplay using the balls position to determine target linear position and when to kick. The kicking function will reset the rod to the home position after a kick has been completed. The controls are issued to the physical controllers in the form of absolute positions.
+  /// \brief This class implements fully open loop gameplay using the balls position to determine target linear position and when to kick. The controls are issued to the physical controllers in the form of absolute positions.
   class RealFoosballTable : public FoosballTable
   {
 
@@ -150,13 +152,13 @@ namespace table
     /// \returns the stepper position
     int getStepperRotVal(double input);
 
-    bool def_reseting = false;
-    bool fwd_reseting = false;
+    bool def_reseting = false; ///< flag for tracking if the defensive rod is reseting after a kick
+    bool fwd_reseting = false; ///< flag for tracking if the offensive rod is reseting after a kick
 
-    tic_server::TicCtrlr def_rot;
-    tic_server::TicCtrlr def_lin;
-    tic_server::TicCtrlr fwd_rot;
-    tic_server::TicCtrlr fwd_lin;
+    tic_server::TicCtrlr def_rot; ///< controller for the defensive rotational motor
+    tic_server::TicCtrlr def_lin; ///< controller for the defensive linear motor
+    tic_server::TicCtrlr fwd_rot; ///< controller for the offensive rotational motor
+    tic_server::TicCtrlr fwd_lin; ///< controller for the offensive linear motor
   };
 
   /// \brief This class changes the kicking function to always spinning by sending velocity commands to the controller and igonoring the rotational position in the joint state message.
@@ -181,7 +183,7 @@ namespace table
     void sendRotationalControl();
   };
 
-  /// \brief This class changes the kicking function by using the player angle detection to determine when a kick has been completed.
+  /// \brief This class changes the kicking function by using the player angle detection to correct for any slip that happens during gameplay.
   class FeedbackTable : public RealFoosballTable
   {
 
@@ -199,17 +201,14 @@ namespace table
 
   private:
 
-    bool def_kicking = false;
-    bool fwd_kicking = false;
+    bool def_kicking = false; ///< flag to determine if the defensive rod is in the act of kicking
+    bool fwd_kicking = false; ///< flag to determine if the offensive rod is in the act of kicking
 
-    int def_kick_start_pos = 0;
-    int fwd_kick_start_pos = 0;
+    int def_kick_start_pos = 0; ///< position that the defensive rod started a kick
+    int fwd_kick_start_pos = 0; ///< position that the offensive rod started a kick
 
-    int def_end_reset_pos = 0;
-    int fwd_end_reset_pos = 0;
-
-    int def_reset_dir = 0;
-    int fwd_reset_dir = 0;
+    int def_end_reset_pos = 0; ///< Target position to reset the defensive rod to after a kick
+    int fwd_end_reset_pos = 0; ///< Target position to reset the offensive rod to after a kick
 
     /// \brief Issue a control based on the joint_states variable. There are unique commands if the rod needs to kick or reset from a kick, otherwise go to the joint_states position value
     void sendRotationalControl();

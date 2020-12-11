@@ -2,7 +2,7 @@
 <package format="2">
   <name>table_description</name>
   <version>1.0.0</version>
-  <description>The files to define a basic foosball table</description>
+  <description>The files to define a basic foosball table visualization</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->

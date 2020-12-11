@@ -1,4 +1,11 @@
-/// \file This is a ROS node to save images from an image topic in order to use for the cascade classifier in opencv.
+/// \file
+/// \brief This is a ROS node to save images from an image topic in order to use for the cascade classifier in opencv. Click 's' on the respective windows to save the image.
+/// PARAMETERS:
+///   file_path: the general directory to store all of the training data
+///   image_group: the sub_directory to store the positive images of the ball
+///   generate_annotation: if true, adds the annotation for a negative image to the data file as per OpenCV documentation
+/// SUBSCRIBES:
+///   /camera/image_rect_color the image from the overhead camera
 
 #include <vector>
 #include <fstream>
@@ -39,26 +46,28 @@ class ImageConverter
 
   int count; ///< used to uniquely name images. Increments as they are saved.
 
-  // Used for cropping
-  bool done_drawing;
-  cv::Point start_corner;
-  cv::Point end_corner;
-  cv::Mat img;
+  bool done_drawing; ///< Used for cropping
+  cv::Point start_corner; ///< drawn rectangle top left corner
+  cv::Point end_corner; ///< drawn rectangle bottom right corner
+  cv::Mat img; ///< image to annotate
 
 public:
+
+  /// \brief default constructor. Initialze the image transport and get the parameters
   ImageConverter() : it_(nh_)
   {
     ros::NodeHandle np("~");
-    ros::NodeHandle n;
 
-    // Subscrive to input video feed and publish output video feed
+    // Subscribe to input video feed and publish output video feed
     image_sub_ = it_.subscribe("/camera/image_rect_color", 1, &ImageConverter::imageCb, this);
 
-    package_path = ros::package::getPath("table_vision_sensing");
+    // Get parameters
     np.getParam("file_path", file_path);
     np.getParam("image_group", image_group);
     np.getParam("generate_annotation", generate_annotation);
 
+    // build paths
+    package_path = ros::package::getPath("table_vision_sensing");
     file_path = "/" + file_path; // "/training_data/"
     full_directory = package_path + file_path; // [package_path]/training_data/
     count = 0;
@@ -69,9 +78,10 @@ public:
 
     ROS_INFO_STREAM(image_group << "Capture: Using Directory:" << full_directory + image_group);
 
+    // Open/Create data files
     info_file.open(full_directory + image_group + ".dat", std::ios::in | std::ios::out | std::ios::app | std::ios::binary);
 
-    // get to last character of file
+    // jump to last character of file
     info_file.seekg(-1,std::ios_base::end);
 
     if(info_file.peek() == '\n') // check if the last character is a new line
@@ -81,7 +91,7 @@ public:
 
       bool g_found = false;
 
-      // loop through and save only the numbers to a seperate string
+      // loop through the last line backwards and save only the numbers to a seperate string
       while(info_file.peek() != '\n')
       {
         char c = info_file.peek();
@@ -109,7 +119,6 @@ public:
       count = std::stoi(digits);
 
       ROS_INFO_STREAM(image_group << " Capture: Image count starting at " << count);
-
     }
 
     else
@@ -119,11 +128,13 @@ public:
     }
   }
 
+  /// \brief default constructor
   ~ImageConverter()
   {
     info_file.close();
   }
 
+  /// \brief callback for the image subscriber
   void imageCb(const sensor_msgs::ImageConstPtr& msg)
   {
 
@@ -146,15 +157,11 @@ public:
 
     image_name = image_group + "/" + image_group + std::to_string(count) + ".jpg";
 
-
     // save the whole image
     if(key == 's')
     {
-
       saveImage(cv_ptr->image);
-
       if(generate_annotation) annotateImage();
-
     }
 
     // if(key == 'c')
@@ -167,6 +174,8 @@ public:
     // }
   }
 
+  /// \brief function to save an image
+  // \param pic image to save
   void saveImage(cv::Mat pic)
   {
     ROS_INFO_STREAM("Saved file: " << full_directory + image_name);
@@ -176,15 +185,24 @@ public:
     count++;
   }
 
+  /// \brief function to handle mouse events inside of a class
+  /// \param event the event type
+  /// \param x the x coordinate of the cursor
+  /// \param y the y coordinate of the cursor
+  /// \param flag
+  /// \param param
   static void mouse_callback_static(int event, int x, int y, int flag, void *param)
   {
     ImageConverter* another = static_cast<ImageConverter*>(param);
     another->mouse_callback(event, x, y, flag);
   }
 
+  /// \brief function to handle mouse events
+  /// \param event the event type
+  /// \param x the x coordinate of the cursor
+  /// \param y the y coordinate of the cursor
   void mouse_callback(int event, int x, int y, int)
   {
-
       if (event == cv::EVENT_LBUTTONDOWN)
       {
         start_corner.x = x;
@@ -201,6 +219,7 @@ public:
       }
   }
 
+  /// \brief crop an image by drawing a rectangle on the image using the mouse
   void cropImage()
   {
     cv::imshow("Crop for " + image_group, img);
@@ -244,19 +263,22 @@ public:
 
       }
     }
-
     cv::destroyWindow("Crop for " + image_group);
     done_drawing = false;
   }
 
+  /// \brief add the annotation to the data file
   void annotateImage()
   {
     ROS_INFO_STREAM("Annotation: " << image_name << "\n" );
     info_file << image_name << "\n";
   }
-
 };
 
+/// \brief main function to create the real_waypoints node
+/// \param argc argument count
+/// \param arguments
+/// \returns success
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "image_capture");

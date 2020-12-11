@@ -50,6 +50,7 @@ namespace tracking
 
     std::vector<double> tests;
 
+    // loop through points and compare to the error threshold
     for(unsigned int i = 0; i < image_points.size(); i++)
     {
       cv::Point3d res = getWorldPosition(image_points.at(i));
@@ -60,11 +61,10 @@ namespace tracking
 
       if(norm > error_threshold)
       {
-        std::cout << "Test Error exceeds threshold for point " << i <<". Error is " << norm;
+        ROS_WARN_STREAM("Homography Error exceeds threshold for point " << i << ". Error is " << norm);
         return true;
       }
     }
-
     return false;
   }
 

@@ -8,7 +8,7 @@
 #include <std_srvs/Empty.h>
 
 #include <stdint.h>
-#include <iostream>
+#include <fstream>
 #include <string>
 
 #include "tic.hpp"
@@ -17,7 +17,7 @@
 namespace tic_server
 {
 
-  /// \brief Class to wrap some of the tic API with ROS functionality
+  /// \brief Class to combine some of the tic API with ROS functionality
   class TicCtrlr
   {
   public:

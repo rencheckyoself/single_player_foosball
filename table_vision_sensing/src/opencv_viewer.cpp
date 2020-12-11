@@ -1,3 +1,16 @@
+/// \file
+/// \brief Use OpenCV to display the image output
+/// PARAMETERS:
+///   point_radius: the radius of the dot drawn for the balls location
+///   show_ball_pos: set to false to hide the ball location dot
+///   show_player_angle: set to false to hide the player detection rectangles
+/// PUBLISHES:
+/// SUBSCRIBES:
+///   /camera/image_rect_color the image from the overhead camera
+///   /BallPosition (geometry_msgs/Point) The image coordinates of the ball
+///   /Def_RodState (table_vision_sensing/RosState) Rod state information for the defensive rod
+///   /Fwd_RodState (table_vision_sensing/RosState) Rod state information for the offensive rod
+
 #include <vector>
 #include <string>
 
@@ -8,7 +21,6 @@
 #include <sensor_msgs/image_encodings.h>
 #include <geometry_msgs/Point.h>
 
-
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -16,56 +28,52 @@
 
 #include "table_vision_sensing/RodState.h"
 
+/// \brief Class to use the ROS Image transport and work with an image.
 class ImageConverter
 {
-  ros::NodeHandle nh_;
+  ros::NodeHandle nh_; ///< node handle
+  image_transport::ImageTransport it_; ///< image transport
+  image_transport::Subscriber image_sub_; ///< image subscriber
 
-  image_transport::ImageTransport it_;
-  image_transport::Subscriber image_sub_;
-  image_transport::Publisher image_pub_;
+  ros::Subscriber ball_pos_sub; ///< ball position subscriber
+  ros::Subscriber def_rect_sub; ///< defensive rod state subscriber
+  ros::Subscriber fwd_rect_sub; ///< offensive rod state subscriber
 
-  ros::Subscriber ball_pos_sub;
-  ros::Subscriber def_rect_sub;
-  ros::Subscriber fwd_rect_sub;
+  ros::Time last_frame_time; ///< the time the last frame was recieved
+  ros::Time current_frame_time; ///< the time the current frame was recieved
 
-  ros::Time last_frame_time;
-  ros::Time current_frame_time;
+  int point_radius = 5; ///< radius of the dot for the balls location
 
-  int point_radius = 5;
+  cv::Point ball_loc; ///< the most recent balls image coordinates
 
-  cv::Point ball_loc;
+  cv::Rect def_rect, fwd_rect; ///< bounding rectangles for the detected players
+  cv::Rect def_window, fwd_window; ///< bounding rectangles for the detection windows
 
-  cv::Rect def_rect, fwd_rect;
-  cv::Rect def_window, fwd_window;
+  bool def_up = false; ///< if the defensive rod is up
+  bool def_back = false; ///< if the defensive rod is back
+  bool fwd_up = false; ///< if the offensive rod is up
+  bool fwd_back = false; ///< if the offensive rod is back
 
-  bool def_up = false;
-  bool def_back = false;
-  bool fwd_up = false;
-  bool fwd_back = false;
-
-  bool show_ball_pos = true;
-  bool show_player_angle = true;
-
-  std::string video_name = "default";
+  bool show_ball_pos = true; ///< flag to draw the balls position on the image
+  bool show_player_angle = true; ///< flag to draw the player detection rectangles on the image
 
 public:
+
+  /// \brief default constructor. Initialze the image transport and get the parameters
   ImageConverter() : it_(nh_)
   {
     ros::NodeHandle np("~");
-    ros::NodeHandle n;
 
-    // Subscrive to input video feed and publish output video feed
+    // Subscribe to input video feed and publish output video feed
     image_sub_ = it_.subscribe("/camera/image_rect_color", 1, &ImageConverter::imageCb, this);
 
-    ball_pos_sub = n.subscribe("BallPosition", 1, &ImageConverter::ballPosCB, this);
-    def_rect_sub = n.subscribe("Def_RodState", 1, &ImageConverter::defRodCB, this);
-    fwd_rect_sub = n.subscribe("Fwd_RodState", 1, &ImageConverter::fwdRodCB, this);
+    ball_pos_sub = nh_.subscribe("BallPosition", 1, &ImageConverter::ballPosCB, this);
+    def_rect_sub = nh_.subscribe("Def_RodState", 1, &ImageConverter::defRodCB, this);
+    fwd_rect_sub = nh_.subscribe("Fwd_RodState", 1, &ImageConverter::fwdRodCB, this);
 
     np.getParam("point_radius", point_radius);
     np.getParam("show_ball_pos", show_ball_pos);
     np.getParam("show_player_angle", show_player_angle);
-    np.getParam("video_name", video_name);
-
 
     current_frame_time = ros::Time::now();
     last_frame_time = ros::Time::now();
@@ -89,6 +97,7 @@ public:
       return;
     }
 
+    // Calculate the FPS
     int fps = 1.0 / (msg->header.stamp - last_frame_time).toSec();
     last_frame_time = msg->header.stamp;
 
@@ -99,7 +108,6 @@ public:
     if(show_ball_pos) cv::circle(cv_ptr->image, ball_loc, point_radius, cv::Scalar(0,0,255), -1);
 
     // Draw the Rod Bounding Boxes
-
     if(show_player_angle)
     {
       cv::Scalar color;
@@ -126,12 +134,16 @@ public:
     cv::waitKey(1);
   }
 
+  /// \brief ball position suscriber
+  /// \param msg ball image coordinates
   void ballPosCB(const geometry_msgs::Point& msg)
   {
     ball_loc.x = msg.x;
     ball_loc.y = msg.y;
   }
 
+  /// \brief defensive rod state subscriber callback
+  /// \msg defensive rod state
   void defRodCB(const table_vision_sensing::RodState msg)
   {
     def_up = msg.rod_is_up;
@@ -141,6 +153,8 @@ public:
     def_window = cv::Rect(msg.window_roi.x_offset, msg.window_roi.y_offset, msg.window_roi.width, msg.window_roi.height);
   }
 
+  /// \brief offensive rod state subscriber callback
+  /// \msg offensive rod state
   void fwdRodCB(const table_vision_sensing::RodState msg)
   {
     fwd_up = msg.rod_is_up;
@@ -153,6 +167,10 @@ public:
 
 };
 
+/// \brief main function to create the real_waypoints node
+/// \param argc argument count
+/// \param arguments
+/// \returns success
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "cascade_classifier");

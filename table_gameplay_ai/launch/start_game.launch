@@ -4,10 +4,12 @@
   <arg name="with_rviz" default="true" doc="Launched rviz if true"/>
   <arg name="mode" default="0" doc="Default: 0. Sets the table play style. 0 is open loop, position based control. 1 is infinte spinning mode."/>
 
+  <!-- start the camera and tracking nodes -->
   <include file="$(find table_vision_sensing)/launch/start_tracking.launch">
     <arg name="view_image" value="$(arg view_image)"/>
   </include>
 
+  <!-- start the gameplay and control node -->
   <node name="follow_ball" type="follow_ball" pkg="table_gameplay_ai" output="screen" required="true">
     <param name="mode" value="$(arg mode)"/>
     <rosparam command="load" file="$(find table_gameplay_ai)/config/homography_config.yaml"/>
@@ -15,11 +17,13 @@
     <rosparam command="load" file="$(find table_motor_control)/config/motor_ids.yaml"/>
   </node>
 
+  <!-- start the rviz vizualization -->
   <include file="$(find table_description)/launch/view_table.launch">
     <arg name="use_gui" value="False"/>
     <arg name="with_rviz" value="$(arg with_rviz)"/>
   </include>
 
+  <!-- start the camera feed with no extra info on it -->
   <node if="$(arg view_image)" name="opencv_viewer_raw" type="opencv_viewer" pkg="table_vision_sensing" output="screen">
     <param name="point_radius" value="3"/> <!-- the radius of the dot of on the viewer -->
     <param name="show_ball_pos" value="false"/>

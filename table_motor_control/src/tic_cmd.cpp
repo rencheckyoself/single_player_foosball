@@ -1,15 +1,9 @@
-//
-// NOTE: The Tic's control mode must be "Serial / I2C / USB".
-
 /// \file
-/// \brief Node to subsribe to commands and send them to the Tic's. Also offers services for manual control.
+/// \brief Node that initializes all of the controllers and offers services to interact manually
 /// PARAMETERS:
-/// PUBLISHES:
-///
-/// SUBSCRIBES:
-///
+///   table_motor_control/config/motor_ids.yaml
 /// SERIVCES:
-
+      // See tic_server.hpp for all services offered.
 #include <ros/ros.h>
 #include <ros/package.h>
 
@@ -19,6 +13,9 @@
 #include "tic_server.hpp"
 
 /// \brief main function to create the real_waypoints node
+/// \param argc argument count
+/// \param arguments
+/// \returns success
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "tic_cmd");
@@ -27,6 +24,7 @@ int main(int argc, char** argv)
   std::string fwd_rot_sn, fwd_lin_sn, def_rot_sn, def_lin_sn;
   std::string fwd_rot_nickname, fwd_lin_nickname, def_rot_nickname, def_lin_nickname;
 
+  // Read in controller params
   np.getParam("fwd_rot/serial_number", fwd_rot_sn);
   np.getParam("fwd_rot/nickname", fwd_rot_nickname);
 

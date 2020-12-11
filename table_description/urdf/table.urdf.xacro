@@ -143,7 +143,7 @@
     </joint>
   </xacro:macro>
 
-  <!-- Macros to create the goal panels with a cut out for the goal -->
+  <!-- Macros to create the end wall panels with a cut out for the goal -->
   <xacro:macro name="end_wall" params="side dir">
     <link name="${side}_end_wall_goal">
       <visual>
@@ -209,10 +209,10 @@
     <child link="table_base"/>
   </joint>
 
+  <!-- This is the world frame used for the ball coordinates -->
   <link name="field">
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </link>
-
   <joint name="field_joint" type="fixed">
     <origin xyz="${(-field_length + ball_diameter)/2} ${(-field_width + ball_diameter)/2} 0" rpy="0 0 0" />
     <parent link="base_link"/>

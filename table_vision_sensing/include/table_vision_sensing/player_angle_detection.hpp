@@ -35,11 +35,11 @@ namespace tracking
   {
     bool rod_is_up = false; ///< true if the rod is raised so that the ball can pass under
     bool players_are_back = false; ///< true if the rod is raised with their feet closest to their own goal
-    cv::Rect boundRect; ///< he bounding rectangle for the detected player contour relative to the cropped image
+    cv::Rect boundRect; ///< the bounding rectangle for the detected player contour relative to the cropped image dimensions
   };
 
   /// \brief class to run the vision processing to detect the
-  /// \TODO Incorperate using the ball position to shift the default ROI to avoid contours merging and throwing off estimation, but may not be needed
+  /// \TODO Incorperate using the ball position to shift the default ROI to avoid contours merging and throwing off estimation
   class PlayerDetector
   {
   public:
@@ -51,11 +51,10 @@ namespace tracking
     /// \param params the parameters for detecting the angle of a rod
     PlayerDetector(PlayerDetectionParams params);
 
+    /// \brief Function to determine the state of the rod based on the provided image
+    /// \param cv_ptr pointer to the most recent image
+    /// \returns the rod state
     RodState detectRodAngle(cv_bridge::CvImagePtr & cv_ptr);
-
-    /// \brief return the bounding rectangle for the detected player contour relative to the whole image (not the cropped one)
-    /// \returns the bounding rectangle
-    // cv::Rect getBoundingRect();
 
   private:
 
@@ -72,10 +71,6 @@ namespace tracking
 
     cv::Rect roi; ///< the ROI of image to track a player
     cv::Rect boundRect;
-
-    cv::Scalar blue = cv::Scalar(256, 0, 0);
-    cv::Scalar green = cv::Scalar(0, 256, 0);
-    cv::Scalar red = cv::Scalar(0, 0, 256);
 
   };
 
