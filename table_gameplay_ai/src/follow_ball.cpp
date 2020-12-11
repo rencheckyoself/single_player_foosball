@@ -95,6 +95,10 @@ int main(int argc, char** argv)
 
   np.getParam("velocity_modifier", config.velocity_modifier);
 
+  np.getParam("def_reset_offset", config.def_reset_offset);
+  np.getParam("fwd_reset_offset", config.fwd_reset_offset);
+  np.getParam("full_rotation_offset", config.full_rotation_offset);
+
   ROS_INFO_STREAM("TICCMD: Forward Rotation Name: " << tic_info.fwd_rot_nickname);
   ROS_INFO_STREAM("TICCMD: Forward Rotation ID: " << tic_info.fwd_rot_sn);
 
@@ -106,7 +110,6 @@ int main(int argc, char** argv)
 
   ROS_INFO_STREAM("TICCMD: Defense Linear Name: " << tic_info.def_lin_nickname);
   ROS_INFO_STREAM("TICCMD: Defense Linear ID: " << tic_info.def_lin_sn);
-
 
   std::vector<std::vector<double>> wc = tracking::parse_points_data(world_coordinates);
   std::vector<std::vector<double>> ic = tracking::parse_points_data(image_coordinates);
@@ -138,7 +141,7 @@ int main(int argc, char** argv)
     }
     default:
     {
-      ROS_ERROR_STREAM("Invalid Mode. Must use 0 (open loop mode), 1 (spin mode), or 2 (feedback and open loop mode).");
+      ROS_ERROR_STREAM("Invalid Mode. Must use 0 (open loop mode), 1 (spin mode), or 2 (rotational feedback mode).");
       ros::shutdown();
     }
   }

@@ -9,7 +9,7 @@
   </include>
 
   <node name="follow_ball" type="follow_ball" pkg="table_gameplay_ai" output="screen" required="true">
-    <param name="mode" value="$(arg mode)"/> 
+    <param name="mode" value="$(arg mode)"/>
     <rosparam command="load" file="$(find table_gameplay_ai)/config/homography_config.yaml"/>
     <rosparam command="load" file="$(find table_gameplay_ai)/config/command_generation_config.yaml"/>
     <rosparam command="load" file="$(find table_motor_control)/config/motor_ids.yaml"/>

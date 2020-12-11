@@ -42,6 +42,10 @@ namespace table
     double fwd_rod_xpos; ///< the x value (in world coordinates) of the ideal position for the defensive rod to strike the ball
 
     double velocity_modifier; ///< the value to scale the max velocity by, should be a value 0 < x <= 1.
+
+    int def_reset_offset; ///< number of steps to rotate backward to reset after a kick.
+    int fwd_reset_offset; ///< number of steps to rotate backward to reset after a kick.
+    int full_rotation_offset; ///< number of steps to complete a full rotation.
   };
 
   /// \brief a class to generate a control based on the state of the table
@@ -204,9 +208,15 @@ namespace table
     int def_end_reset_pos = 0;
     int fwd_end_reset_pos = 0;
 
+    int def_reset_dir = 0;
+    int fwd_reset_dir = 0;
+
+    /// \brief Issue a control based on the joint_states variable. There are unique commands if the rod needs to kick or reset from a kick, otherwise go to the joint_states position value
     void sendRotationalControl();
 
-    /// \brief Uses the rod states to determine if the
+    /// \brief Logic to check if the kicking or reseting action has been completed
+    /// \param fwd_rod_state the state of the attacking rod
+    /// \param def_rod_state the state of the defending rod
     void kickCheck(tracking::RodState fwd_rod_state, tracking::RodState def_rod_state);
 
   };

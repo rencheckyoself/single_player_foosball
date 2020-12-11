@@ -7,7 +7,7 @@ fwd:
 
   area_limit: 700 # threshold to filter out non_player contours
   end_kick_width: 100 # the width of the rectangle fit to the player at the end of a kick
-  end_kick_x: 30 # the top left corner x coordinate of the rectangle fit to the player at the end of a kick
+  end_kick_x: 13 # the top left corner x coordinate of the rectangle fit to the player at the end of a kick
 
 # Defensive Rod
 def:

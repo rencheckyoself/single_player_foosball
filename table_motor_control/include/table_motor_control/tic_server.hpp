@@ -70,6 +70,9 @@ namespace tic_server
     /// \brief stops the motor and sets 0 absolute position to the current position.
     void reset_global_position();
 
+    /// \brief stops the motor
+    void halt();
+
     /// \brief prints the current settings of the tic controller
     void display_settings();
 

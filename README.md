@@ -178,9 +178,9 @@ roslaunch table_gameplay_ai start_game.launch with_rviz:=false view_image:=false
 Throw ball onto table and play!
 
 Change the `mode` argument type to change the play style of the table:
-- 0: (default) open loop, position based control. Relies on the accuracy of the stepper controller position count to move.
+- 0: (default) Open loop. Relies on the accuracy of the stepper controller position count to move.
 - 1: Infinite spin. The linear position control stays the same as mode 0, but the rods will continually spin.
-
+- 2: Rotation feedback. Same linear control scheme, but the angular control uses the player angle detection to account for any slipping during gameplay.
 
 ## Packages
 

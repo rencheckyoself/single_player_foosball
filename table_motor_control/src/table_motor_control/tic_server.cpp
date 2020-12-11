@@ -69,6 +69,11 @@ namespace tic_server
     handle.halt_and_set_position(0);
   }
 
+  void TicCtrlr::halt()
+  {
+    handle.halt_and_hold();
+  }
+
   void TicCtrlr::display_settings()
   {
     std::cout << "TIC SETTINGS: " << handle.get_settings().to_string() << std::endl;

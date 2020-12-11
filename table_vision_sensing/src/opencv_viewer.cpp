@@ -104,14 +104,14 @@ public:
     {
       cv::Scalar color;
 
-      if(def_up) color = cv::Scalar(0,255,0);
-      else if(def_up && def_back) color = cv::Scalar(0,0,255);
+      if(def_up && def_back) color = cv::Scalar(0,0,255);
+      else if(def_up) color = cv::Scalar(0,255,0);
       else color = cv::Scalar(255,0,0);
 
       cv::rectangle(cv_ptr->image, def_rect, color, 2);
 
-      if(fwd_up) color = cv::Scalar(0,255,0);
-      else if(fwd_up && fwd_back) color = cv::Scalar(0,0,255);
+      if(fwd_up && fwd_back) color = cv::Scalar(0,0,255);
+      else if(fwd_up) color = cv::Scalar(0,255,0);
       else color = cv::Scalar(255,0,0);
 
       cv::rectangle(cv_ptr->image, fwd_rect, color, 2);

@@ -231,33 +231,42 @@ namespace table
     {
       def_rot.set_position(def_end_reset_pos);
     }
-    else if(joint_states.at(0) == -1.5)
+    else if(!def_kicking)
     {
-      if(!def_kicking)
+      if(joint_states.at(0) == -1.5)
       {
         def_kick_start_pos = def_rot.get_current_pos();
         def_rot.set_velocity(-std::floor(config.velocity_modifier * def_rot.get_max_speed()));
         def_kicking = true;
       }
-    }
-    else
-    {
-      def_rot.set_position(getStepperRotVal(joint_states.at(0)));
+      // else if(joint_states.at(0) == 1.5)
+      // {
+      //   def_kick_start_pos = def_rot.get_current_pos();
+      //   def_rot.set_velocity(std::floor(config.velocity_modifier * def_rot.get_max_speed()));
+      //   def_kicking = true;
+      // }
+      else
+      {
+        def_rot.set_position(getStepperRotVal(joint_states.at(0)));
+      }
     }
 
     if(fwd_reseting)
     {
       fwd_rot.set_position(fwd_end_reset_pos);
     }
-    else if(joint_states.at(2) == -1.5 && !fwd_kicking)
+    else if(!fwd_kicking)
     {
-      fwd_kick_start_pos = fwd_rot.get_current_pos();
-      fwd_rot.set_velocity(-std::floor(config.velocity_modifier * fwd_rot.get_max_speed()));
-      fwd_kicking = true;
-    }
-    else
-    {
-      fwd_rot.set_position(getStepperRotVal(joint_states.at(2)));
+      if(joint_states.at(2) == -1.5)
+      {
+        fwd_kick_start_pos = fwd_rot.get_current_pos();
+        fwd_rot.set_velocity(-std::floor(config.velocity_modifier * fwd_rot.get_max_speed()));
+        fwd_kicking = true;
+      }
+      else
+      {
+        fwd_rot.set_position(getStepperRotVal(joint_states.at(2)));
+      }
     }
   }
 
@@ -266,7 +275,7 @@ namespace table
 
     tracking::rod_angle def_rod, fwd_rod;
 
-    // Set the rod state
+    // Determine the state of the defensive rod
     if(def_rod_state.rod_is_up)
     {
       if(def_rod_state.players_are_back) def_rod = tracking::BACK;
@@ -277,6 +286,7 @@ namespace table
       def_rod = tracking::NEUTRAL;
     }
 
+    // Determine the state of the offensive rod
     if(fwd_rod_state.rod_is_up)
     {
       if(fwd_rod_state.players_are_back) fwd_rod = tracking::BACK;
@@ -287,42 +297,62 @@ namespace table
       fwd_rod = tracking::NEUTRAL;
     }
 
+    // Check if the kicking or resetting action has been completed.
     if(def_kicking)
     {
-      if(def_rod == tracking::UP || def_rot.get_current_pos() <= def_kick_start_pos - 200)
+      // stop rotating if the the rod is up or has completed 1 full rotation.
+      if(def_rod == tracking::UP || def_rot.get_current_pos() <= def_kick_start_pos - config.full_rotation_offset)
       {
+        def_rot.halt();
         def_kicking = false;
-
-        if(!def_reseting)
-        {
-          def_reseting = true;
-          def_end_reset_pos = def_rot.get_current_pos();
-        }
+        def_reseting = true;
+        def_reset_dir = 1;
+        def_end_reset_pos = def_rot.get_current_pos() + config.def_reset_offset; // set the reseting target position to be slight larger than the 90deg.
+        joint_states.at(0) = 0.5;
       }
+      // stop rotating if the the rod is back or has completed 1 full rotation.
+      // else if(def_rod == tracking::BACK || def_rot.get_current_pos() >= def_kick_start_pos + config.full_rotation_offset)
+      // {
+      //   def_rot.halt();
+      //   def_kicking = false;
+      //   def_reseting = true;
+      //   def_reset_dir = -1;
+      //   def_end_reset_pos = def_rot.get_current_pos() - config.def_reset_offset; // set the reseting target position to be slight larger than the 90deg.
+      //   joint_states.at(0) = 0.5;
+      // }
     }
-    else if(def_reseting && def_rot.get_current_pos() == def_end_reset_pos)
+    else if(def_reseting)
     {
-      def_reseting = false;
-      def_rot.reset_global_position();
+      joint_states.at(0) = 0.5;
+
+      // stop reseting if the target has been reached or exceeded
+      if( def_reset_dir * (def_rot.get_current_pos() - def_end_reset_pos) >= 0)
+      {
+        def_reseting = false;
+        def_rot.reset_global_position();
+      }
     }
 
     if(fwd_kicking)
     {
-      if(fwd_rod == tracking::UP || fwd_rot.get_current_pos() <= fwd_kick_start_pos - 200)
+      if(fwd_rod == tracking::UP || fwd_rot.get_current_pos() <= fwd_kick_start_pos - config.full_rotation_offset)
       {
+        fwd_rot.halt();
         fwd_kicking = false;
-
-        if(!fwd_reseting)
-        {
-          fwd_reseting = true;
-          fwd_end_reset_pos = fwd_rot.get_current_pos();
-        }
+        fwd_reseting = true;
+        fwd_end_reset_pos = fwd_rot.get_current_pos() + config.fwd_reset_offset;
+        joint_states.at(2) = 0.5;
       }
     }
-    else if(fwd_reseting && fwd_rot.get_current_pos() == fwd_end_reset_pos)
+    else if(fwd_reseting)
     {
-      fwd_reseting = false;
-      fwd_rot.reset_global_position();
+      joint_states.at(2) = 0.5;
+
+      if(fwd_rot.get_current_pos() >= fwd_end_reset_pos)
+      {
+        fwd_reseting = false;
+        fwd_rot.reset_global_position();
+      }
     }
   }
 }

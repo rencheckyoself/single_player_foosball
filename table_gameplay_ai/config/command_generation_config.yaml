@@ -13,3 +13,7 @@ def_rod_xpos: 0.067 # the x value (in world coordinates) of the ideal position f
 fwd_rod_xpos: 0.257 # the x value (in world coordinates) of the ideal position for the offensive rod to strike the ball
 
 velocity_modifier: 0.55 # a value from 0 < x <= 1, scales the maximum velocity setting without changing the value in the controller settings.
+
+def_reset_offset: 70 # number of steps to rotate backward to reset after a kick. This is only used for the feedback mode.
+fwd_reset_offset: 50 # number of steps to rotate backward to reset after a kick. This is only used for the feedback mode.
+full_rotation_offset: 200 # number of steps to complete a full rotation. This is only used for the feedback mode.

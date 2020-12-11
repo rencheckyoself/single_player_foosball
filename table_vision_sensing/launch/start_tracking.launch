@@ -1,9 +1,13 @@
 <launch>
 
   <arg name="view_image" default="False" doc="Set to True to show the image from the camera on launch."/>
+  <arg name="show_ball_pos" default="true" doc="Displays a red dot on the most up to date ball position"/>
+  <arg name="show_player_angle" default="true" doc="Displays bounding rectangles defining the roi and the detected player."/>
 
   <include file="$(find table_vision_sensing)/launch/start_ocam.launch">
     <arg name="view_image" value="$(arg view_image)"/>
+    <arg name="show_ball_pos" value="$(arg show_ball_pos)"/>
+    <arg name="show_player_angle" value="$(arg show_player_angle)"/>
   </include>
 
   <node name="ball_tracking" type="ball_tracking" pkg="table_vision_sensing" output="screen"/>
