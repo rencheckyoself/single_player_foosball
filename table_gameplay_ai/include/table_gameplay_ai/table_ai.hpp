@@ -8,8 +8,8 @@
 #include <cmath>
 
 #include <opencv2/highgui/highgui.hpp>
-#include "table_motor_control/tic_server.hpp"
-#include "table_vision_sensing/player_angle_detection.hpp"
+#include "tic_server.hpp"
+#include "player_angle_detection.hpp"
 
 namespace table
 {

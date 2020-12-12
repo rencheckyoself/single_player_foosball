@@ -78,8 +78,8 @@ add_message_files(
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
   DEPENDENCIES
+  sensor_msgs
   std_msgs
-	sensor_msgs
 )
 
 ################################################
@@ -112,9 +112,9 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
- INCLUDE_DIRS include
+ INCLUDE_DIRS include/${PROJECT_NAME}
  LIBRARIES ${PROJECT_NAME}
- CATKIN_DEPENDS  cv_bridge geometry_msgs image_geometry image_transport roscpp sensor_msgs std_msgs
+ CATKIN_DEPENDS  cv_bridge geometry_msgs image_geometry image_transport message_runtime roscpp sensor_msgs std_msgs
 #  DEPENDS system_lib
 )
 
@@ -206,7 +206,7 @@ target_link_libraries(${PROJECT_NAME}_player_tracking
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-install(TARGETS ${PROJECT_NAME}_ball_tracking ${PROJECT_NAME}_training_image_capture ${PROJECT_NAME}_opencv_viewer ${PROJECT_NAME}_player_tracking
+install(TARGETS ${PROJECT_NAME}_ball_tracking ${PROJECT_NAME}_opencv_viewer ${PROJECT_NAME}_player_tracking ${PROJECT_NAME}_training_image_capture
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
