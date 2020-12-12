@@ -1,5 +1,7 @@
 # Single Player Foosball Table
 
+[Video](https://mrencheck.wixsite.com/michaelrencheck/single-player-foosball)
+
 <img src="table_description/img/overview.jpg" width="600">
 
 ## Dependencies
